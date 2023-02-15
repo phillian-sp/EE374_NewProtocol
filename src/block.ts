@@ -34,6 +34,7 @@ export class Block {
   studentids: string[] | undefined
   blockid: string
   fees: number | undefined
+  height: number | undefined
   
   public static async fromNetworkObject(object: BlockObjectType): Promise<Block> {
     return new Block(
@@ -119,11 +120,47 @@ export class Block {
   isGenesis(): boolean {
     return this.previd === null
   }
+
+  /**
+   * Get the height of the block. If the height is already known, it is returned
+   * immediately. Otherwise, the parent block is retrieved and the height of the
+   * parent block is retrieved recursively. If the parent block is the genesis
+   * block, the height of the block is 0. Otherwise, the height of the block is
+   * the height of the parent block plus 1.
+   * 
+   * @param peer the peer from which to retrieve the block
+   * @returns the height of the block
+   */
+  async getHeight(peer?: Peer): Promise<number> {
+    if (this.height !== undefined) {
+      return this.height
+    }
+    // if height is undefined, we need to have peer as an argument
+    if (peer === undefined) {
+      throw new AnnotatedError("INTERNAL_ERROR", "Block height is undefined, but no peer was provided to retrieve it from")
+    }
+    let parentBlock = await this.validateAncestry(peer)
+    // if the block has no parent, it is the genesis block
+    if (parentBlock === null) {
+      this.height = 0
+    }
+    else {
+      this.height = await parentBlock.getHeight() + 1
+    }
+    return this.height
+  }
+  /**
+   * Get the transactions of the block.
+   * 
+   * @param peer the peer from which to retrieve the transactions
+   * @returns the transactions of the block
+   */
   async getTxs(peer?: Peer): Promise<Transaction[]> {
     const txPromises: Promise<ObjectType>[] = []
     let maybeTransactions: ObjectType[] = []
     const txs: Transaction[] = []
 
+    // push all transaction retrieval promises to an array
     for (const txid of this.txids) {
       if (peer === undefined) {
         txPromises.push(objectManager.get(txid))
@@ -132,6 +169,9 @@ export class Block {
         txPromises.push(objectManager.retrieve(txid, peer))
       }
     }
+
+    // wait for all transactions to be retrieved
+    // if one fails, reject the block
     try {
       maybeTransactions = await Promise.all(txPromises)
     }
@@ -139,6 +179,8 @@ export class Block {
       throw new AnnotatedError('UNFINDABLE_OBJECT', `Retrieval of transactions of block ${this.blockid} failed; rejecting block`)
     }
     logger.debug(`We have all ${this.txids.length} transactions of block ${this.blockid}`)
+
+    // check that all retrieved objects are transactions
     for (const maybeTx of maybeTransactions) {
       if (!TransactionObject.guard(maybeTx)) {
         throw new AnnotatedError('UNFINDABLE_OBJECT', `Block reports a transaction with id ${objectManager.id(maybeTx)}, but this is not a transaction.`)
@@ -149,11 +191,21 @@ export class Block {
 
     return txs
   }
+
+  /**
+   * Validate the block's transactions and calculate the UTXO state after the block.
+   * 
+   * @param peer the peer from which to retrieve the transactions
+   * @param stateBefore the UTXO state before the block
+   * @returns the UTXO state after the block
+   * @throws AnnotatedError if the block is invalid
+   */
   async validateTx(peer: Peer, stateBefore: UTXOSet) {
     logger.debug(`Validating ${this.txids.length} transactions of block ${this.blockid}`)
 
     const stateAfter = stateBefore.copy()
 
+    // wait for all transactions to be retrieved
     const txs = await this.getTxs(peer)
 
     for (let idx = 0; idx < txs.length; idx++) {
@@ -180,15 +232,29 @@ export class Block {
     catch (e) {}
 
     if (coinbase !== undefined) {
+      // check that the coinbase transaction respects macroeconomic policy
       if (coinbase.outputs[0].value > BLOCK_REWARD + fees) {
         throw new AnnotatedError('INVALID_BLOCK_COINBASE',`Coinbase transaction does not respect macroeconomic policy. `
                       + `Coinbase output was ${coinbase.outputs[0].value}, while reward is ${BLOCK_REWARD} and fees were ${fees}.`)
+      }
+
+      // determine its height and check that its height field matches the height of the block
+      if (coinbase.height != await this.getHeight(peer)) {
+        throw new AnnotatedError('INVALID_BLOCK_COINBASE', `Coinbase transaction ${coinbase.txid} has height ${coinbase.height}, but block ${this.blockid} has height ${this.getHeight()}`)
       }
     }
 
     await db.put(`blockutxo:${this.blockid}`, Array.from(stateAfter.outpoints))
     logger.debug(`UTXO state of block ${this.blockid} cached: ${JSON.stringify(Array.from(stateAfter.outpoints))}`)
   }
+
+  /**
+   * Validates the block's ancestry, i.e. whether the parent block is valid and can be found.
+   * 
+   * @param peer The peer from which to retrieve the parent block
+   * @returns The parent block, if it is valid and can be found
+   * @throws AnnotatedError if the parent block is not valid or cannot be found
+   */
   async validateAncestry(peer: Peer): Promise<Block | null> {
     if (this.previd === null) {
       // genesis
@@ -198,6 +264,7 @@ export class Block {
     let parentBlock: Block
     try {
       logger.debug(`Retrieving parent block of ${this.blockid} (${this.previd})`)
+      // throws an error if the parent block is not found within the timeout
       const parentObject = await objectManager.retrieve(this.previd, peer)
 
       if (!BlockObject.guard(parentObject)) {
@@ -219,6 +286,7 @@ export class Block {
         throw new AnnotatedError('INVALID_FORMAT', `Block ${this.blockid} does not specify the fixed target ${TARGET}, but uses target ${this.T} instead.`)
       }
       logger.debug(`Block target for ${this.blockid} is valid`)
+
       if (!this.hasPoW()) {
         throw new AnnotatedError('INVALID_BLOCK_POW', `Block ${this.blockid} does not satisfy the proof-of-work equation; rejecting block.`)
       }
@@ -227,6 +295,7 @@ export class Block {
       let parentBlock: Block | null = null
       let stateBefore: UTXOSet | undefined
 
+      // validate ancestor blocks
       if (this.isGenesis()) {
         if (!util.isDeepStrictEqual(this.toNetworkObject(), GENESIS)) {
           throw new AnnotatedError('INVALID_FORMAT', `Invalid genesis block ${this.blockid}: ${JSON.stringify(this.toNetworkObject())}`)
@@ -237,6 +306,7 @@ export class Block {
         logger.debug(`State before block ${this.blockid} is the genesis state`)
       }
       else {
+        // validate parent blocks
         parentBlock = await this.validateAncestry(peer)
 
         if (parentBlock === null) {
@@ -252,6 +322,18 @@ export class Block {
       if (stateBefore === undefined) {
         throw new AnnotatedError('UNFINDABLE_OBJECT', `We have not calculated the state of the parent block,`
                       + `so we cannot calculate the state of the current block with blockid = ${this.blockid}`)
+      }
+      // Check that the timestamp of each block (the created field) is later than that of its parent, 
+      // and earlier than the current time.
+      if (parentBlock !== null && this.created <= parentBlock.created) {
+        throw new AnnotatedError('INVALID_BLOCK_TIMESTAMP', `Block ${this.blockid} has timestamp ${this.created}, ` 
+        + `which is not later than the timestamp of its parent ${parentBlock.blockid} (${parentBlock.created})`)
+      }
+      // get current time
+      const second = Math.floor(Date.now() / 1000)
+      if (this.created > second) {
+        throw new AnnotatedError('INVALID_BLOCK_TIMESTAMP', `Block ${this.blockid} has timestamp ${this.created}, `
+                      + `which is later than the current time ${second}`)
       }
 
       logger.debug(`State before block ${this.blockid} is ${stateBefore}`)

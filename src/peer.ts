@@ -83,6 +83,13 @@ export class Peer {
     this.debug(`Sending message: ${message}`)
     this.socket.sendMessage(message)
   }
+  /**
+   * fatalError is called when a peer sends us a message that we cannot
+   * parse, or when we encounter an internal error. We send the error
+   * message to the peer, and then close the connection.
+   * 
+   * @param err the error to send to the peer
+   */
   async fatalError(err: AnnotatedError) {
     await this.sendError(err)
     this.warn(`Peer error: ${err}`)
@@ -93,12 +100,22 @@ export class Peer {
     this.socket.end()
     peerManager.peerFailed(this.peerAddr)
   }
+  /**
+   * Called when a peer connects to us
+   */
   async onConnect() {
     this.active = true
     await this.sendHello()
     await this.sendGetPeers()
   }
+  /**
+   * Called when a peer does not send us an complete message within
+   * a certain amount of time. We close the connection.
+   * 
+   * @returns a promise that resolves when the connection is closed
+   */
   async onTimeout() {
+    // QUESTION: Why we need to return a promise here?
     return await this.fatalError(new AnnotatedError('INVALID_FORMAT', 'Timed out before message was complete'))
   }
   async onMessage(message: string) {
@@ -183,6 +200,12 @@ export class Peer {
     }
     await this.sendObject(obj)
   }
+  /**
+   * Called when a peer sends us an object. We store it in the database,
+   * and then validate it. If it is valid, we gossip it to our peers.
+   * 
+   * @param msg message containing the object
+   */
   async onMessageObject(msg: ObjectMessageType) {
     const objectid: ObjectId = objectManager.id(msg.object)
     let known: boolean = false
@@ -201,6 +224,8 @@ export class Peer {
       await objectManager.put(msg.object)
     }
 
+    // validate object
+    // if it is invalid, we will send an error message to the peer
     let instance: Block | Transaction;
     try {
       instance = await objectManager.validate(msg.object, this)
@@ -218,9 +243,21 @@ export class Peer {
       })
     }
   }
+  /**
+   * Called when the peer reports an error
+   * 
+   * @param msg the error message
+   */
   async onMessageError(msg: ErrorMessageType) {
     this.warn(`Peer reported error: ${msg.name}`)
   }
+  /**
+   * the function to log messages with the peer's address
+   * 
+   * @param level the log level
+   * @param message message to log
+   * @param args additional arguments to log
+   */
   log(level: string, message: string, ...args: any[]) {
     logger.log(
       level,

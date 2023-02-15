@@ -106,33 +106,52 @@ export class Transaction {
     if (SpendingTransactionObject.guard(txObj)) {
       inputs = Transaction.inputsFromNetworkObject(txObj.inputs)
     }
-    else {
+    else { // coinbase transaction
       height = txObj.height
     }
     const outputs = Transaction.outputsFromNetworkObject(txObj.outputs)
 
     return new Transaction(objectManager.id(txObj), inputs, outputs, height)
-  }
+  } 
+  /**
+   * byId - Get a transaction by its id
+   * 
+   * @param txid the id of the transaction
+   * @returns a promise that resolves to the transaction
+   */
   static async byId(txid: ObjectId): Promise<Transaction> {
     return this.fromNetworkObject(await objectManager.get(txid))
   }
+
   constructor(txid: ObjectId, inputs: Input[], outputs: Output[], height: number | null = null) {
     this.txid = txid
     this.inputs = inputs
     this.outputs = outputs
     this.height = height
   }
+
   isCoinbase() {
     return this.inputs.length === 0
   }
+
+  /**
+   * validate - Validate a transaction
+   * 
+   * @param idx index of the transaction in the block
+   * @param block the block that the transaction is in
+   */
   async validate(idx?: number, block?: Block) {
     logger.debug(`Validating transaction ${this.txid}`)
     const unsignedTxStr = canonicalize(this.toNetworkObject(false))
 
+    // coinbase transaction
     if (this.isCoinbase()) {
+      // coinbase transaction must have a single output
       if (this.outputs.length > 1) {
         throw new AnnotatedError('INVALID_FORMAT', `Invalid coinbase transaction ${this.txid}. Coinbase must have only a single output.`)
       }
+
+      // coinbase transaction must be the first in a block
       if (block !== undefined && idx !== undefined) {
         // validating coinbase transaction in the context of a block
         if (idx > 0) {
@@ -154,15 +173,18 @@ export class Transaction {
 
     const inputValues = await Promise.all(
       this.inputs.map(async (input, i) => {
+        // check that the transaction is not spending an immature coinbase
         if (blockCoinbase !== undefined && input.outpoint.txid === blockCoinbase.txid) {
           throw new AnnotatedError('INVALID_TX_OUTPOINT', `Transaction ${this.txid} is spending immature coinbase`)
         }
 
         const prevOutput = await input.outpoint.resolve()
         
+        // check the signature is not null
         if (input.sig === null) {
           throw new AnnotatedError('INVALID_TX_SIGNATURE', `No signature available for input ${i} of transaction ${this.txid}`)
         }
+        // check that the signature is valid
         if (!await ver(input.sig, unsignedTxStr, prevOutput.pubkey)) {
           throw new AnnotatedError('INVALID_TX_SIGNATURE', `Signature validation failed for input ${i} of transaction ${this.txid}`)
         }

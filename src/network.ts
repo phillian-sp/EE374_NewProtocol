@@ -75,6 +75,8 @@ export class MessageSocket extends EventEmitter {
 
     this.peerAddr = peerAddr
     this.netSocket = netSocket
+    
+    // called when data is received
     this.netSocket.on('data', (data: string) => {
       if (this.buffer.length > MAX_BUFFER_SIZE) {
         this.emit('timeout')

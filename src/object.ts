@@ -15,6 +15,8 @@ export const db = new level('./db')
 const OBJECT_AVAILABILITY_TIMEOUT = 5000 // ms
 
 class ObjectManager {
+  // map from objectid to a list of deferred objects that are waiting for this object
+  // to be available
   deferredObjects: { [key: string]: Deferred<ObjectType>[] } = {}
 
   id(obj: any) {
@@ -41,12 +43,14 @@ class ObjectManager {
     const objectid = this.id(object)
 
     logger.debug(`Storing object with id ${objectid}: %o`, object)
+    // resolve any promises waiting for this object
     if (objectid in this.deferredObjects) {
       for (const deferred of this.deferredObjects[objectid]) {
         deferred.resolve(object)
       }
       delete this.deferredObjects[objectid]
     }
+    // store object in database
     return await db.put(`object:${this.id(object)}`, object)
   }
   async validate(object: ObjectType, peer: Peer) {
@@ -65,6 +69,13 @@ class ObjectManager {
       }
     )(object)
   }
+  /**
+   * Retrieve an object from the database or from a peer
+   * 
+   * @param objectid the id of the object to retrieve
+   * @param peer     the peer to request the object from if it is not in the database
+   * @returns        the object
+   */
   async retrieve(objectid: ObjectId, peer: Peer): Promise<ObjectType> {
     logger.debug(`Retrieving object ${objectid}`)
     let object: ObjectType
@@ -73,6 +84,7 @@ class ObjectManager {
     if (!(objectid in this.deferredObjects)) {
       this.deferredObjects[objectid] = []
     }
+    // add this promise to the list of promises waiting for this object
     this.deferredObjects[objectid].push(deferred)
 
     try {
