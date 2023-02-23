@@ -1,11 +1,11 @@
 import { db } from "./object";
 import { logger } from "./logger";
 import { Hash } from "./message";
-import { Block } from "./block";
+import { GENESIS_BLOCK } from "./block";
 
 class ChaintipManager {
   height: number = 0;
-  blockid: Hash = Block.getGenesisBlock().blockid;
+  blockid: Hash = "0000000052a0e645eca917ae1c196e0d0a4fb756747f29ef52594d68484bb5e2";
 
   async load() {
     try {
@@ -23,6 +23,9 @@ class ChaintipManager {
   async store() {
     await db.put("chaintipheight", this.height);
     await db.put("chaintipid", this.blockid);
+    // add genesis block to database
+    await db.put(`object:${this.blockid}`, GENESIS_BLOCK.toNetworkObject())
+    await db.put(`blockutxo:${this.blockid}`, [])
   }
 
   setLongestTip(height: number, blockid: Hash) {
