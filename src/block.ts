@@ -77,6 +77,15 @@ export class Block {
     this.studentids = studentids;
     this.blockid = hash(canonicalize(this.toNetworkObject()));
   }
+  static getGenesisBlock(): Block {
+    const genesis = new Block(GENESIS.previd, GENESIS.txids, GENESIS.nonce, GENESIS.T, GENESIS.created, GENESIS.miner, GENESIS.note, undefined)
+    return genesis
+  }
+  static async add_genesis_block() {
+    const block = Block.getGenesisBlock()
+    await objectManager.put(block.toNetworkObject())
+    await db.put(`blockutxo:${block.blockid}`, [])
+  }
   async loadStateAfter(): Promise<UTXOSet | undefined> {
     try {
       return new UTXOSet(

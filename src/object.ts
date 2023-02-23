@@ -109,6 +109,10 @@ class ObjectManager {
 
     return object
   }
+  constructor() {
+    // add genesis block to database
+    this.put(Block.getGenesisBlock())
+  }
 }
 
 export const objectManager = new ObjectManager()

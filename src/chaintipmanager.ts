@@ -1,10 +1,11 @@
 import { db } from "./object";
 import { logger } from "./logger";
 import { Hash } from "./message";
+import { Block } from "./block";
 
 class ChaintipManager {
-  height: number = -1;
-  blockid?: Hash = "";
+  height: number = 0;
+  blockid: Hash = Block.getGenesisBlock().blockid;
 
   async load() {
     try {
