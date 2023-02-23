@@ -2,7 +2,7 @@ import net from "net";
 import { delay } from "./promise";
 
 const SERVER_PORT = 18018;
-const SERVER_HOST = "0.0.0.0";
+const SERVER_HOST = "45.32.133.136";
 
 const socket = new net.Socket();
 
@@ -148,6 +148,20 @@ socket.connect(SERVER_PORT, SERVER_HOST, async () => {
   await delay(2000);
 
   console.log("Test 6 -- Non-increasing timestamps");
+
+  // send transactions first
+  socket.write(
+    `{"object":{"height":1,"outputs":[{"pubkey":"098a6f1ed9b34134f13b8166991670cd108af7ec3c4012939ef23c5393f0092d","value":50000000000000}],"type":"transaction"},"type":"object"}\n`
+  );
+
+  socket.write(
+    `{"object":{"height":2,"outputs":[{"pubkey":"098a6f1ed9b34134f13b8166991670cd108af7ec3c4012939ef23c5393f0092d","value":60000000000000}],"type":"transaction"},"type":"object"}\n`
+  );
+
+  socket.write(
+    `{"object":{"height":2,"outputs":[{"pubkey":"098a6f1ed9b34134f13b8166991670cd108af7ec3c4012939ef23c5393f0092d","value":60000000000000}],"type":"transaction"},"type":"object"}\n`
+  );
+  // now test
   socket.write(
     `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1671185419,"miner":"grader","nonce":"09e111c7e1e7acb6f8cac0bb2fc4c8bc2ae3baaab9165cc458e199cb96d5e3d4","note":"Second block","previd":"000000003594345d2ed18acd072c02d00925fbdffd91cb18e6e93de28eca4f24","txids":["549d3f85cdf6c7abfaee5ea962a65148ee79e54f491d42f233fc7be80217fa39","5b3a28a26992097c733b24ae9abe6788dda2cc005897c4e746e1985c138edc74"],"type":"block"},"type":"object"}\n`
   );
@@ -259,6 +273,12 @@ socket.connect(SERVER_PORT, SERVER_HOST, async () => {
   );
 
   console.log("Test 13 -- Future timestamp");
+
+  // get transactions
+  socket.write(
+    `{"object":{"inputs":[{"outpoint":{"index":0,"txid":"17a497c5e14bc2277d142bc0677c2a70d5452ec78fe7c1279cba1837f854bde1"},"sig":"8f25a254a56dd03740e7ff7bfe8a3bbc3481f03690d1b9636389e6ac9364c74ae73d35b7078bc4e08a0d870f6539267bbc98dc63e8ce8f3fd34055a54a670305"}],"outputs":[{"pubkey":"098a6f1ed9b34134f13b8166991670cd108af7ec3c4012939ef23c5393f0092d","value":40000000000000}],"type":"transaction"},"type":"object"}\n`
+  );
+  //test
   socket.write(
     `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":9950650400,"miner":"grader","nonce":"5f7091a5abb0874df3e8cb4543a5eb93b0441e9ca4c2b0fb3d30875ceb8e1516","note":"Third block","previd":"000000008e4bb9d68745df1597ae86eb28ebdf3228249e74c995ffcda054190e","txids":["e5d80b133c19c4a41931ad25c645725576b64847993f3712c23ac0a683ec5b7c","f8be8fee401f942467866a197a8d2a8a3a3e58809154e85895810dc40cb581d9"],"type":"block"},"type":"object"}\n`
   );
