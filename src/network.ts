@@ -40,19 +40,30 @@ class Network {
       try {
         const peer = new Peer(MessageSocket.createClient(peerAddr), peerAddr);
         //DELETE AFTER TESTING
-        if (!b) {
-          await delay(1000);
-          peer.socket.netSocket.write(
-            `{"objectid":"17a497c5e14bc2277d142bc0677c2a70d5452ec78fe7c1279cba1837f854bde1","type":"getobject"}\n`
-          );
-          peer.socket.netSocket.write(
-            `{"objectid":"549d3f85cdf6c7abfaee5ea962a65148ee79e54f491d42f233fc7be80217fa39","type":"getobject"}\n`
-          );
-          peer.socket.netSocket.write(
-            `{"objectid":"5b3a28a26992097c733b24ae9abe6788dda2cc005897c4e746e1985c138edc74","type":"getobject"}\n`
-          );
-          b = true;
-        }
+        // if (!b) {
+        // await delay(500);
+        // peer.socket.netSocket.write(
+        //   `{"objectid":"17a497c5e14bc2277d142bc0677c2a70d5452ec78fe7c1279cba1837f854bde1","type":"getobject"}\n`
+        // );
+        // peer.socket.netSocket.write(
+        //   `{"objectid":"549d3f85cdf6c7abfaee5ea962a65148ee79e54f491d42f233fc7be80217fa39","type":"getobject"}\n`
+        // );
+        // peer.socket.netSocket.write(
+        //   `{"objectid":"5b3a28a26992097c733b24ae9abe6788dda2cc005897c4e746e1985c138edc74","type":"getobject"}\n`
+        // );
+
+        // peer.socket.netSocket.write(
+        //   `{"objectid":"058d7388dc7410baacf71112bc3b1c2820c9c329edf6397093647c601ff84777","type":"getobject"}\n`
+        // );
+        // peer.socket.netSocket.write(
+        //   `{"objectid":"36e2f567d8a144ae8cd55fffae636d747c7d1ed77f965c2ba7d5036f63c017dd","type":"getobject"}\n`
+        // );
+        // peer.socket.netSocket.write(
+        //   `{"objectid":"8790187596c417cc41fe632bb1eaa779e0529dc256a37df9c531d012198a0b18","type":"getobject"}\n`
+        // );
+
+        //   b = true;
+        // }
 
         this.peers.push(peer);
       } catch (e: any) {
