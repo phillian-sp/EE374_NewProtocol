@@ -210,6 +210,20 @@ socket.connect(SERVER_PORT, SERVER_HOST, async () => {
   console.log("Test 3 -- Valid Blockchain");
 
   console.log("Test 13 -- Future timestamp");
+  socket.write(
+    `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":9950650400,"miner":"grader","nonce":"5f7091a5abb0874df3e8cb4543a5eb93b0441e9ca4c2b0fb3d30875ceb8e1516","note":"Third block","previd":"000000008e4bb9d68745df1597ae86eb28ebdf3228249e74c995ffcda054190e","txids":["e5d80b133c19c4a41931ad25c645725576b64847993f3712c23ac0a683ec5b7c","f8be8fee401f942467866a197a8d2a8a3a3e58809154e85895810dc40cb581d9"],"type":"block"},"type":"object"}\n`
+  );
+  await delay(2000);
+  
+  socket.write(
+    `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1671141391,"miner":"grader","nonce":"76931fac9dab2b36c248b87d6ae33f9a62d7183a5d5789e4b2d6b4424ffb0a6e","note":"Second block","previd":"00000000130a7ea5bb706109f89a4fe0daacca9835bccdbb8d5703088c9c5d87","txids":["549d3f85cdf6c7abfaee5ea962a65148ee79e54f491d42f233fc7be80217fa39","5b3a28a26992097c733b24ae9abe6788dda2cc005897c4e746e1985c138edc74"],"type":"block"},"type":"object"}\n`
+  );
+  await delay(2000);
+
+  socket.write(
+    `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1671125374,"miner":"grader","nonce":"8042a948aac5e884cb3ec7db925643fd34fdd467e2cca406035cb2745be20664","note":"First block","previd":"0000000052a0e645eca917ae1c196e0d0a4fb756747f29ef52594d68484bb5e2","txids":["17a497c5e14bc2277d142bc0677c2a70d5452ec78fe7c1279cba1837f854bde1"],"type":"block"},"type":"object"}\n`
+  );
+  await delay(2000);
 
   console.log("Test 14 -- Unavailable previous block (bonus)");
 
