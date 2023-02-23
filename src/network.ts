@@ -51,6 +51,12 @@ class Network {
           peer.socket.netSocket.write(
             `{"objectid":"5b3a28a26992097c733b24ae9abe6788dda2cc005897c4e746e1985c138edc74","type":"getobject"}\n`
           );
+          peer.socket.netSocket.write(
+            `{"objectid":"e5d80b133c19c4a41931ad25c645725576b64847993f3712c23ac0a683ec5b7c","type":"getobject"}\n`
+          );
+          peer.socket.netSocket.write(
+            `{"objectid":"f8be8fee401f942467866a197a8d2a8a3a3e58809154e85895810dc40cb581d9","type":"getobject"}\n`
+          );
           b = true;
         }
 
