@@ -357,7 +357,7 @@ export class Block {
       if (this.isGenesis()) {
         if (!util.isDeepStrictEqual(this.toNetworkObject(), GENESIS)) {
           throw new AnnotatedError(
-            "INVALID_FORMAT",
+            "INVALID_GENESIS",
             `Invalid genesis block ${this.blockid}: ${JSON.stringify(
               this.toNetworkObject()
             )}`
