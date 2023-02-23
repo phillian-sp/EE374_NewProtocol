@@ -111,7 +111,7 @@ class ObjectManager {
   }
   constructor() {
     // add genesis block to database
-    this.put(Block.getGenesisBlock())
+    Block.add_genesis_block()
   }
 }
 
