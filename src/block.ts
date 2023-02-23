@@ -357,7 +357,7 @@ export class Block {
       if (this.isGenesis()) {
         if (!util.isDeepStrictEqual(this.toNetworkObject(), GENESIS)) {
           throw new AnnotatedError(
-            "INVALID_FORMAT",
+            "INVALID_GENESIS",
             `Invalid genesis block ${this.blockid}: ${JSON.stringify(
               this.toNetworkObject()
             )}`
@@ -428,4 +428,13 @@ export class Block {
   }
 }
 
-export const GENESIS_BLOCK = new Block(GENESIS.previd, GENESIS.txids, GENESIS.nonce, GENESIS.T, GENESIS.created, GENESIS.miner, GENESIS.note, undefined)
+export const GENESIS_BLOCK = new Block(
+  GENESIS.previd,
+  GENESIS.txids,
+  GENESIS.nonce,
+  GENESIS.T,
+  GENESIS.created,
+  GENESIS.miner,
+  GENESIS.note,
+  undefined
+);
