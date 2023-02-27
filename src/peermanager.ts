@@ -43,10 +43,6 @@ class PeerManager {
     this.store() // intentionally delayed await
     logger.info(`Known peers: ${this.knownPeers.size}`)
   }
-  /**
-   * Called when a peer is considered faulty
-   * @param peerAddr peer address to remove
-   */
   peerFailed(peerAddr: string) {
     logger.warn(`Removing known peer, as it is considered faulty`)
     this.knownPeers.delete(peerAddr)
