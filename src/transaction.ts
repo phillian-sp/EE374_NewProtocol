@@ -168,6 +168,13 @@ export class Transaction {
           throw new AnnotatedError('INVALID_TX_SIGNATURE', `Signature validation failed for input ${i} of transaction ${this.txid}`)
         }
 
+        // Ensure that a transaction does not have multiple inputs that have the same outpoint.
+        for (let j = 0; j < i; j++) {
+          if (this.inputs[j].outpoint.txid === input.outpoint.txid && this.inputs[j].outpoint.index === input.outpoint.index) {
+            throw new AnnotatedError('INVALID_TX_OUTPOINT', `Transaction ${this.txid} has multiple inputs that spend the same outpoint.`)
+          }
+        }
+
         return prevOutput.value
       })
     )
