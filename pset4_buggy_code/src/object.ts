@@ -22,9 +22,11 @@ class ObjectManager {
   id(obj: any) {
     return hash(canonicalize(obj))
   }
+
   async exists(objectid: ObjectId) {
     return await db.exists(`object:${objectid}`)
   }
+
   async get(objectid: ObjectId) {
     try {
       return await db.get(`object:${objectid}`)
@@ -32,6 +34,7 @@ class ObjectManager {
       throw new AnnotatedError('UNKNOWN_OBJECT', `Object ${objectid} not known locally`)
     }
   }
+
   async del(objectid: ObjectId) {
     try {
       return await db.del(`object:${objectid}`)
@@ -39,6 +42,7 @@ class ObjectManager {
       throw new AnnotatedError('UNKNOWN_OBJECT', `Object ${objectid} not known locally`)
     }
   }
+
   async put(object: any) {
     const objectid = this.id(object)
 
@@ -53,6 +57,7 @@ class ObjectManager {
     // store object in database
     return await db.put(`object:${this.id(object)}`, object)
   }
+
   async validate(object: ObjectType, peer: Peer) {
     return await ObjectTxOrBlock.match<Promise<Block | Transaction>>(
       async (obj: TransactionObjectType) => {
@@ -69,6 +74,7 @@ class ObjectManager {
       }
     )(object)
   }
+  
   /**
    * Retrieve an object from the database or from a peer
    * 

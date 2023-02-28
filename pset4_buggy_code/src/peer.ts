@@ -276,14 +276,14 @@ export class Peer {
 
     if (!(await db.exists(msg.objectid))) {
       this.info(`Object ${msg.objectid} discovered`);
-      await this.sendGetObject(msg.objectid);
+      await this.sendGetObject(msg.objectid)
     }
   }
 
   async onMessageGetObject(msg: GetObjectMessageType) {
     this.info(`Peer requested object with id: ${msg.objectid}`);
 
-    let obj;
+    let obj
     try {
       obj = await objectManager.get(msg.objectid);
     } catch (e) {
@@ -293,23 +293,25 @@ export class Peer {
           "UNKNOWN_OBJECT",
           `Unknown object with id ${msg.objectid}`
         )
-      );
-      return;
+      )
+      return
     }
-    await this.sendObject(obj);
+    await this.sendObject(obj)
   }
 
   async onMessageGetMempool(msg: GetMempoolMessageType) {
-    this.info(`Peer requested mempool`);
+    this.info(`Peer requested mempool`)
 
-    // TODO
+    // TODO - potential implementation below, but currently throwing error
+    // const txids = await Mempool.getTxids()
+    // await this.sendMempool(txids)
   }
 
   async onMessageMempool(msg: MempoolMessageType) {
-    this.info(`Peer sent mempool`);
+    this.info(`Peer sent mempool`)
 
     msg.txids.forEach(async (txid) => {
-      await this.sendGetObject(txid); 
+      await this.sendGetObject(txid)
     }); 
   }
 
@@ -351,7 +353,7 @@ export class Peer {
       if (instance instanceof Transaction) {
         await Mempool.apply(instance);
       }
-      
+
       // gossip
       network.broadcast({
         type: "ihaveobject",

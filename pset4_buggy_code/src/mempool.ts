@@ -75,9 +75,4 @@ export class Mempool {
         logger.debug(`Getting all transaction ids from mempool`)
         return Array.from(this.txids)
     }
-    
-    async getFees() {
-        logger.debug(`Getting all fees from mempool`)
-        let fees = 0
-    }
 }
