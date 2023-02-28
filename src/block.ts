@@ -367,6 +367,51 @@ export class Block {
           }
         }
       }
+      logger.debug(`Block proof-of-work for ${this.blockid} is valid`);
+
+      // Ensure if present that the note and miner fields in a block are ASCII-printable strings
+      // up to 128 characters long each. ASCII printable characters are those with decimal values
+      //  32 up to 126. If this is not the case, send back an INVALID_FORMAT error.
+      if (this.note !== null) {
+        if (!this.note?.match(/^[\x20-\x7e]{1,128}$/)) {
+          throw new AnnotatedError(
+            "INVALID_FORMAT",
+            `Block ${this.blockid} has a note field that is not a string of ASCII-printable characters up to 128 characters long.`
+          );
+        }
+      }
+      logger.debug(`Block note for ${this.blockid} is valid`);
+
+      if (this.miner !== null) {
+        if (!this.miner?.match(/^[\x20-\x7e]{1,128}$/)) {
+          throw new AnnotatedError(
+            "INVALID_FORMAT",
+            `Block ${this.blockid} has a miner field that is not a string of ASCII-printable characters up to 128 characters long.`
+          );
+        }
+      }
+
+      /*
+       * Ensure if present that the studentids field is an array with at most 10 ASCII-printable
+       * strings each containing up to 128 characters. If the studentids field is present but does
+       * not follow these constraints, send back an INVALID_FORMAT error
+       */
+      if (this.studentids !== null) {
+        if (this.studentids && this.studentids.length > 10) {
+          throw new AnnotatedError(
+            "INVALID_FORMAT",
+            `Block ${this.blockid} has a studentids field that is not an array with at most 10 ASCII-printable strings.`
+          );
+        }
+        for (const studentid of this.studentids ?? []) {
+          if (!studentid.match(/^[\x20-\x7e]{1,128}$/)) {
+            throw new AnnotatedError(
+              "INVALID_FORMAT",
+              `Block ${this.blockid} has a studentids field that is not an array with strings each containing up to 128 characters.`
+            );
+          }
+        }
+      }
 
       let parentBlock: Block | null = null;
       let stateBefore: UTXOSet | undefined;

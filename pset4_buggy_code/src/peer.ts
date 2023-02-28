@@ -6,8 +6,10 @@ import {
   Message,
   HelloMessage,
   PeersMessage,
+  MempoolMessage,
   ChaintipMessage,
   GetPeersMessage,
+  GetMempoolMessage,
   GetChaintipMessage,
   IHaveObjectMessage,
   GetObjectMessage,
@@ -23,6 +25,8 @@ import {
   GetObjectMessageType,
   ObjectMessageType,
   ErrorMessageType,
+  GetMempoolMessageType,
+  MempoolMessageType,
   AnnotatedError,
 } from "./message";
 import { peerManager } from "./peermanager";
@@ -33,6 +37,7 @@ import { network } from "./network";
 import { ObjectId } from "./object";
 import { Block } from "./block";
 import { Transaction } from "./transaction";
+import { Mempool } from "./mempool";
 
 const VERSION = "0.9.0";
 const NAME = "Malibu (pset3)";
@@ -64,7 +69,11 @@ export class Peer {
       peers: [...peerManager.knownPeers],
     });
   }
-
+  async sendGetMempool() {
+    this.sendMessage({
+      type: "getmempool",
+    })
+  }
   async sendGetChaintip() {
     this.sendMessage({ type: "getchaintip" });
   }
@@ -82,6 +91,12 @@ export class Peer {
     this.sendMessage({
       type: "object",
       object: obj,
+    });
+  }
+  async sendMempool(txids: any) {
+    this.sendMessage({
+      type: "mempool",
+      txids: txids,
     });
   }
   async sendGetObject(objid: ObjectId) {
@@ -133,6 +148,7 @@ export class Peer {
     await this.sendHello();
     await this.sendGetPeers();
     await this.sendGetChaintip();
+    await this.sendGetMempool();
   }
   /**
    * Called when a peer does not send us an complete message within
@@ -202,7 +218,10 @@ export class Peer {
       this.onMessageObject.bind(this),
       this.onMessageError.bind(this),
       this.OnMessageChaintip.bind(this),
-      this.OnMessageGetChaintip.bind(this)
+      this.OnMessageGetChaintip.bind(this),
+      this.onMessageGetMempool.bind(this),
+      this.onMessageMempool.bind(this)
+      
     )(msg);
   }
   async onMessageHello(msg: HelloMessageType) {
@@ -219,6 +238,7 @@ export class Peer {
     );
     this.handshakeCompleted = true;
   }
+  
   async onMessagePeers(msg: PeersMessageType) {
     for (const peer of msg.peers.slice(0, MAX_PEERS_PER_PEER)) {
       this.info(`Remote party reports knowledge of peer ${peer}`);
@@ -240,6 +260,7 @@ export class Peer {
       await this.sendGetObject(msg.blockid);
     }
   }
+
   async onMessageGetPeers(msg: GetPeersMessageType) {
     this.info(`Remote party is requesting peers. Sharing.`);
     await this.sendPeers();
@@ -249,18 +270,20 @@ export class Peer {
     this.info(`Remote party is requesting chaintip. Sharing`);
     await this.sendChaintip();
   }
+
   async onMessageIHaveObject(msg: IHaveObjectMessageType) {
     this.info(`Peer claims knowledge of: ${msg.objectid}`);
 
     if (!(await db.exists(msg.objectid))) {
       this.info(`Object ${msg.objectid} discovered`);
-      await this.sendGetObject(msg.objectid);
+      await this.sendGetObject(msg.objectid)
     }
   }
+
   async onMessageGetObject(msg: GetObjectMessageType) {
     this.info(`Peer requested object with id: ${msg.objectid}`);
 
-    let obj;
+    let obj
     try {
       obj = await objectManager.get(msg.objectid);
     } catch (e) {
@@ -270,11 +293,28 @@ export class Peer {
           "UNKNOWN_OBJECT",
           `Unknown object with id ${msg.objectid}`
         )
-      );
-      return;
+      )
+      return
     }
-    await this.sendObject(obj);
+    await this.sendObject(obj)
   }
+
+  async onMessageGetMempool(msg: GetMempoolMessageType) {
+    this.info(`Peer requested mempool`)
+
+    // TODO - potential implementation below, but currently throwing error
+    // const txids = await Mempool.getTxids()
+    // await this.sendMempool(txids)
+  }
+
+  async onMessageMempool(msg: MempoolMessageType) {
+    this.info(`Peer sent mempool`)
+
+    msg.txids.forEach(async (txid) => {
+      await this.sendGetObject(txid)
+    }); 
+  }
+
   /**
    * Called when a peer sends us an object. We store it in the database,
    * and then validate it. If it is valid, we gossip it to our peers.
@@ -309,6 +349,11 @@ export class Peer {
     }
 
     if (!known) {
+      // add to our own mempool
+      if (instance instanceof Transaction) {
+        await Mempool.apply(instance);
+      }
+
       // gossip
       network.broadcast({
         type: "ihaveobject",

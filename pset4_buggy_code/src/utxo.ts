@@ -42,10 +42,12 @@ export class UTXOSet {
       seen.add(outpointStr)
     }
     logger.debug(`Transaction is valid with respect to UTXO set`)
+    
     // Transaction is valid wrt state; apply it
     for (const input of tx.inputs) {
       this.outpoints.delete(input.outpoint.toString())
     }
+    
     logger.debug(`Adding ${tx.outputs.length} outputs to UTXO set`)
     for (let i = 0; i < tx.outputs.length; ++i) {
       this.outpoints.add((new Outpoint(tx.txid, i)).toString())
