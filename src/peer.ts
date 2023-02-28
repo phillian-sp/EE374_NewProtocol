@@ -287,7 +287,12 @@ export class Peer {
 
       // update mempool if tx
       if (TransactionObject.guard(msg.object)) {
-        mempoolManager.addTx(Transaction.fromNetworkObject(msg.object));
+        try {
+          mempoolManager.addTx(Transaction.fromNetworkObject(msg.object));
+        } catch (e: any) {
+          this.sendError(e);
+          return;
+        }
       }
     }
   }
