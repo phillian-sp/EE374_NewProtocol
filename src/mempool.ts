@@ -14,7 +14,9 @@ class MempoolManager {
     try {
       this.mempoolState.apply(tx);
       this.mempool.push(tx);
-      logger.info(`Transaction ${tx.txid} added to the mempool.`);
+      logger.info(
+        `Transaction ${tx.txid} added to the mempool. New mempool state is ${this.mempoolState} and mempool is ${this.mempool}`
+      );
     } catch (e) {
       throw new AnnotatedError(
         "INVALID_TX_OUTPOINT",
@@ -42,8 +44,6 @@ class MempoolManager {
     logger.info(
       `Mempool has been reorged, new mempool state is ${this.mempoolState} and mempool is ${this.mempool}`
     );
-    console.log(this.mempoolState);
-    console.log(this.mempool);
   }
 }
 
