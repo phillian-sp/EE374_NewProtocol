@@ -131,6 +131,9 @@ export type GetPeersMessageType = Static<typeof GetPeersMessage>;
 export const GetChaintipMessage = Record({ type: Literal("getchaintip") });
 export type GetChaintipMessageType = Static<typeof GetChaintipMessage>;
 
+export const GetMempoolMessage = Record({ type: Literal("getmempool") });
+export type GetMempoolMessageType = Static<typeof GetMempoolMessage>;
+
 export const PeersMessage = Record({
   type: Literal("peers"),
   peers: Array(String),
@@ -141,8 +144,13 @@ export const ChaintipMessage = Record({
   type: Literal("chaintip"),
   blockid: Hash,
 });
-
 export type ChaintipMessageType = Static<typeof ChaintipMessage>;
+
+export const MempoolMessage = Record({
+  type: Literal("mempool"),
+  txids: Array(Hash),
+});
+export type MempoolMessageType = Static<typeof MempoolMessage>;
 
 export const GetObjectMessage = Record({
   type: Literal("getobject"),
@@ -175,6 +183,8 @@ export const Messages = [
   ErrorMessage,
   ChaintipMessage,
   GetChaintipMessage,
+  GetMempoolMessage,
+  MempoolMessage
 ];
 export const Message = Union(
   HelloMessage,
@@ -185,7 +195,9 @@ export const Message = Union(
   ObjectMessage,
   ErrorMessage,
   ChaintipMessage,
-  GetChaintipMessage
+  GetChaintipMessage,
+  GetMempoolMessage, 
+  MempoolMessage
 );
 export type MessageType = Static<typeof Message>;
 
