@@ -17,7 +17,16 @@ class MempoolManager {
       logger.info(
         `Transaction ${tx.txid} added to the mempool. New mempool state is ${this.mempoolState} and mempool is ${this.mempool}`
       );
+      // log all the transactions in the mempool and their state
+      console.log("Mempool state is: ", this.mempoolState);
+      // loop through the mempool and log each transaction
+      for (const tx of this.mempool) {
+        console.log("Mempool transaction is: ", tx);
+      }
     } catch (e: any) {
+      logger.warn(
+        `Transaction ${tx.txid} could not be added to the mempool due to an already spent transaction input. The error was: ${e.message}`
+      );
       throw new AnnotatedError(
         "INVALID_TX_OUTPOINT",
         `Transaction cannot be added to the mempool due to an already spent transaction input. The error was: ${e.message}`
