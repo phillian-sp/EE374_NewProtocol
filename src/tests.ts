@@ -395,11 +395,65 @@ socket.connect(SERVER_PORT, SERVER_HOST, async () => {
 
   socket.write(`{"type":"getmempool"}\n`);
 
-  console.log("============ Testcase: Mempool with longer chain ============");
+  // console.log("============ Testcase: Mempool with longer chain ============");
 
-  socket.write(
-    `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1672137626,"miner":"grader","nonce":"76931fac9dab2b36c248b87d6ae33f9a62d7183a5d5789e4b2d6b441fc68bc86","note":"New sixth block","previd":"000000000474866bce17e23d78a1657e8ede848af734b83454fb8bed463f18ec","txids":[],"type":"block"},"type":"object"}\n`
-  );
+  // socket.write(
+  //   `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1672137626,"miner":"grader","nonce":"76931fac9dab2b36c248b87d6ae33f9a62d7183a5d5789e4b2d6b441fc68bc86","note":"New sixth block","previd":"000000000474866bce17e23d78a1657e8ede848af734b83454fb8bed463f18ec","txids":[],"type":"block"},"type":"object"}\n`
+  // );
+
+  // await delay(1000);
+
+  // socket.write(
+  //   `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1672106718,"miner":"grader","nonce":"5f7091a5abb0874df3e8cb4543a5eb93b0441e9ca4c2b0fb3d30875cd1b230ab","note":"New fifth block","previd":"000000003c335476ebaf28d224a7182c9e6caca35473c4b714ca9b0dc726ca95","txids":[],"type":"block"},"type":"object"}\n`
+  // );
+  // await delay(1000);
+  // socket.write(
+  //   `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1672036939,"miner":"grader","nonce":"5f7091a5abb0874df3e8cb4543a5eb93b0441e9ca4c2b0fb3d30875d26a35e2d","note":"New fourth block","previd":"0000000057562aea36ace523c9d21b8babfb9c5eeb39c81ae3ef4ee4896ac50d","txids":["60c3e2f40d8a039d145fda39ce82d64257bdf8494f974ae98edb415baaea0141"],"type":"block"},"type":"object"}\n`
+  // );
+
+  // await delay(1000);
+
+  // socket.write(
+  //   `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1672013469,"miner":"grader","nonce":"09e111c7e1e7acb6f8cac0bb2fc4c8bc2ae3baaab9165cc458e199cbcfb45e45","note":"Third block","previd":"000000006d9664d0be194502d4eb1ff548fdc6d2476c52f538a93fe81a46f054","txids":["0ec3d29d6cc241d9c21cc4540c6ffc1c7a39b7ea7a168b07bb2410f84624741f","35cf663af677600c08acd562c7a0cdc9f817f1de89cf6e293cdbfd16e9fb9c3e"],"type":"block"},"type":"object"}\n`
+  // );
+  // await delay(1000);
+  // socket.write(
+  //   `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1671948306,"miner":"grader","nonce":"5f7091a5abb0874df3e8cb4543a5eb93b0441e9ca4c2b0fb3d30875ccbb3d68e","note":"Second block","previd":"00000000a0e4cf2b1cb6a1d3e1c87fa486ec28589dfe84c26d1b684d03d4178f","txids":["7d0f471727af839843fa2aa54e6d9a7165b57dc4e5ca4926526fd5480c591c46"],"type":"block"},"type":"object"}\n`
+  // );
+
+  // await delay(1000);
+  // socket.write(
+  //   `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1671917454,"miner":"grader","nonce":"5f7091a5abb0874df3e8cb4543a5eb93b0441e9ca4c2b0fb3d30875cde154e4f","note":"First block","previd":"00000000a7d343579d796fe01600844f52dfe64f0dbca7ec2b3119edf5c7295a","txids":["49e0562967c0b316391421e95f829aa2e3d2b954b6ff6c5ae05c22e1990df964"],"type":"block"},"type":"object"}\n`
+  // );
+
+  // await delay(1000);
+
+  // socket.write(
+  //   `{"object":{"height":22,"outputs":[{"pubkey":"f5b51ecf9ad70301553d3e5f9299e2c8766f8bbbbb3c2a5432a56f69b3ca6308","value":400}],"type":"transaction"},"type":"object"}\n`
+  // );
+
+  // await delay(1000);
+
+  // socket.write(
+  //   `{"object":{"height":23,"outputs":[{"pubkey":"b1444716930feb7bdafda2a44b0e04598f3036acb8d65e06585f17c354ea6431","value":400}],"type":"transaction"},"type":"object"}\n`
+  // );
+
+  // await delay(1000);
+
+  // socket.write(
+  //   `{"object":{"inputs":[{"outpoint":{"index":0,"txid":"49e0562967c0b316391421e95f829aa2e3d2b954b6ff6c5ae05c22e1990df964"},"sig":"ef9ebf4f279f5de09f67b7e437f73e7eca5fc151cbca7bb0a7af6ff975f76763a221d14ebebe7b5e850684756e69cfc9a18cce8fced688806322805282a7b109"}],"outputs":[{"pubkey":"9c36a788f48db23289bdb44312db43abf1971543bef3546583e99e7c8d7aab8b","value":10}],"type":"transaction"},"type":"object"}\n`
+  // );
+
+  // await delay(1000);
+
+  // socket.write(
+  //   `{"object":{"inputs":[{"outpoint":{"index":0,"txid":"0ec3d29d6cc241d9c21cc4540c6ffc1c7a39b7ea7a168b07bb2410f84624741f"},"sig":"d5e2f5fb28154855ec95fd5188a47716a5d4b817560cc673c05a2ee91cc50134dd7704cc9226022f26423d9fe45293a0c2ea775e4d5b367d23157615e576f903"}],"outputs":[{"pubkey":"b1444716930feb7bdafda2a44b0e04598f3036acb8d65e06585f17c354ea6431","value":20}],"type":"transaction"},"type":"object"}\n`
+  // );
+
+  // await delay(1000);
+
+  // console.log("Sending getmempool...");
+  // socket.write(`{"type":"getmempool"}\n`);
 });
 
 socket.on("data", (data) => {

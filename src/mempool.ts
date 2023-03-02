@@ -10,9 +10,9 @@ class MempoolManager {
   mempool: Transaction[] = [];
   mempoolState: UTXOSet = new UTXOSet(new Set<string>());
 
-  addTx(tx: Transaction) {
+  async addTx(tx: Transaction) {
     try {
-      this.mempoolState.apply(tx);
+      await this.mempoolState.apply(tx);
       this.mempool.push(tx);
       logger.info(
         `Transaction ${tx.txid} added to the mempool. New mempool state is ${this.mempoolState} and mempool is ${this.mempool}`
@@ -26,17 +26,19 @@ class MempoolManager {
   }
 
   getTxidArray() {
+    console.log("Getting mempool");
+    console.log(this.mempool);
     return this.mempool.map((tx: Transaction) => tx.txid);
   }
 
-  reorg(block: Block) {
+  async reorg(block: Block) {
     if (block.stateAfter) {
       this.mempoolState = block.stateAfter;
       const oldMempool = this.mempool;
       this.mempool = [];
       for (const tx of oldMempool) {
         try {
-          this.addTx(tx);
+          await this.addTx(tx);
         } catch (e) {}
       }
     }

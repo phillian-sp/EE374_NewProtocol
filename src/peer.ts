@@ -133,10 +133,7 @@ export class Peer {
   }
   async onTimeout() {
     return await this.fatalError(
-      new AnnotatedError(
-        "INVALID_FORMAT",
-        "Timed out before message was complete"
-      )
+      new AnnotatedError("INVALID_FORMAT", "Timed out before message was complete")
     );
   }
   async onMessage(message: string) {
@@ -149,10 +146,7 @@ export class Peer {
       this.debug(`Parsed message into: ${JSON.stringify(msg)}`);
     } catch {
       return await this.fatalError(
-        new AnnotatedError(
-          "INVALID_FORMAT",
-          `Failed to parse incoming message as JSON: ${message}`
-        )
+        new AnnotatedError("INVALID_FORMAT", `Failed to parse incoming message as JSON: ${message}`)
       );
     }
     if (!Message.guard(msg)) {
@@ -170,10 +164,7 @@ export class Peer {
         return this.onMessageHello(msg);
       }
       return await this.fatalError(
-        new AnnotatedError(
-          "INVALID_HANDSHAKE",
-          `Received message ${message} prior to "hello"`
-        )
+        new AnnotatedError("INVALID_HANDSHAKE", `Received message ${message} prior to "hello"`)
       );
     }
     Message.match(
@@ -244,10 +235,7 @@ export class Peer {
     } catch (e) {
       this.warn(`We don't have the requested object with id: ${msg.objectid}`);
       this.sendError(
-        new AnnotatedError(
-          "UNKNOWN_OBJECT",
-          `Unknown object with id ${msg.objectid}`
-        )
+        new AnnotatedError("UNKNOWN_OBJECT", `Unknown object with id ${msg.objectid}`)
       );
       return;
     }
@@ -288,7 +276,7 @@ export class Peer {
       // update mempool if tx
       if (TransactionObject.guard(msg.object)) {
         try {
-          mempoolManager.addTx(Transaction.fromNetworkObject(msg.object));
+          await mempoolManager.addTx(Transaction.fromNetworkObject(msg.object));
         } catch (e: any) {
           this.sendError(e);
           return;
