@@ -4,7 +4,7 @@ import { chainManager } from "./chain";
 import { AnnotatedError } from "./message";
 
 const BIND_PORT = 18018;
-const BIND_IP = "0.0.0.0";
+const BIND_IP = "45.32.133.136";
 
 logger.info(`Malibu - A Marabu node`);
 logger.info(`Dionysis Zindros <dionyziz@stanford.edu>`);

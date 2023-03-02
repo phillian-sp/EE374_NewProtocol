@@ -16,8 +16,12 @@ import {
   AnnotatedError,
   GetMempoolMessageType,
   MempoolMessageType,
+<<<<<<< HEAD
   SpendingTransactionObject,
   SpendingTransactionObject,
+=======
+  TransactionObject,
+>>>>>>> parent of 08b19a7 (final pset 5 debug)
 } from "./message";
 import { peerManager } from "./peermanager";
 import { canonicalize } from "json-canonicalize";
@@ -273,7 +277,6 @@ export class Peer {
         type: "ihaveobject",
         objectid,
       });
-    }
 
       // update mempool if tx
       if (TransactionObject.guard(msg.object)) {
