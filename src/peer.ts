@@ -16,12 +16,8 @@ import {
   AnnotatedError,
   GetMempoolMessageType,
   MempoolMessageType,
-<<<<<<< HEAD
   SpendingTransactionObject,
-  SpendingTransactionObject,
-=======
   TransactionObject,
->>>>>>> parent of 08b19a7 (final pset 5 debug)
 } from "./message";
 import { peerManager } from "./peermanager";
 import { canonicalize } from "json-canonicalize";
@@ -277,15 +273,15 @@ export class Peer {
         type: "ihaveobject",
         objectid,
       });
+    }
 
-      // update mempool if tx
-      if (TransactionObject.guard(msg.object)) {
-        try {
-          await mempoolManager.addTx(Transaction.fromNetworkObject(msg.object));
-        } catch (e: any) {
-          this.sendError(e);
-          return;
-        }
+    // update mempool if tx
+    if (SpendingTransactionObject.guard(msg.object)) {
+      try {
+        await mempoolManager.addTx(Transaction.fromNetworkObject(msg.object));
+      } catch (e: any) {
+        this.sendError(e);
+        return;
       }
     }
   }
@@ -309,10 +305,7 @@ export class Peer {
 
   async onMessageMempool(msg: MempoolMessageType) {
     for (let txid of msg.txids) {
-      const knownTx = await objectManager.exists(txid);
-      if (!knownTx) {
-        this.sendGetObject(txid);
-      }
+      this.sendGetObject(txid);
     }
   }
 

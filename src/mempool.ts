@@ -31,7 +31,7 @@ class MempoolManager {
 
   async reorg(block: Block) {
     if (block.stateAfter) {
-      this.mempoolState = block.stateAfter;
+      this.mempoolState = block.stateAfter.copy();
       const oldMempool = this.mempool;
       this.mempool = [];
       for (const tx of oldMempool) {

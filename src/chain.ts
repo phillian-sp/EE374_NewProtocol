@@ -11,9 +11,7 @@ class ChainManager {
   }
   async onValidBlockArrival(block: Block) {
     if (!block.valid) {
-      throw new Error(
-        `Received onValidBlockArrival() call for invalid block ${block.blockid}`
-      );
+      throw new Error(`Received onValidBlockArrival() call for invalid block ${block.blockid}`);
     }
     const height = block.height;
 
@@ -26,12 +24,10 @@ class ChainManager {
       );
     }
     if (height > this.longestChainHeight) {
-      logger.debug(
-        `New longest chain has height ${height} and tip ${block.blockid}`
-      );
+      logger.debug(`New longest chain has height ${height} and tip ${block.blockid}`);
       this.longestChainHeight = height;
       this.longestChainTip = block;
-      mempoolManager.reorg(block);
+      await mempoolManager.reorg(block);
     }
   }
 }
