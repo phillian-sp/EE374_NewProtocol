@@ -393,7 +393,7 @@ socket.connect(SERVER_PORT, SERVER_HOST, async () => {
 
   console.log("Sending getmempool...");
 
-  socket.write(`{"type":"getmempool"}`);
+  socket.write(`{"type":"getmempool"}\n`);
 
   console.log("============ Testcase: Mempool with longer chain ============");
 
