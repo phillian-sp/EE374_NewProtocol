@@ -166,9 +166,7 @@ socket.connect(SERVER_PORT, SERVER_HOST, async () => {
   //   );
   //   console.log("Should receive INVALID_FORMAT error and not gossip.");
 
-  console.log(
-    "============ Testcase 5: Mempool valid and invalid transactions ============"
-  );
+  console.log("============ Testcase 5: Mempool valid and invalid transactions ============");
 
   socket.write(
     `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1672097032,"miner":"grader","nonce":"5f8592e30a2205a485846248987550aaf2094ec59e7931dc650c7451cc9db602","note":"Fifth block","previd":"000000004005ec7c733c25dfc39810a465e75276efc616a4c72631a2c932702d","txids":["1802ac8ce48e5923d64510bec7d4fa4f385e1f489b370c977a43999d1cd1eeeb","b3f8f422d04b90863dfa42a35d743e555e8c5ebbf75e3f5d09a34f0518fe9d07"],"type":"block"},"type":"object"}\n`
@@ -260,7 +258,7 @@ socket.connect(SERVER_PORT, SERVER_HOST, async () => {
   );
 
   socket.write(
-    `{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1671711442,"miner":"grader","nonce":"76931fac9dab2b36c248b87d6ae33f9a62d7183a5d5789e4b2d6b4423a1ca5ce","note":"Block 14","previd":"000000004aad030d7704407f400e0f4600aef2cbafdcb8a17e36158657b48879","txids":[],"type":"block"},"type":"object"}\n`
+    `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1671711442,"miner":"grader","nonce":"76931fac9dab2b36c248b87d6ae33f9a62d7183a5d5789e4b2d6b4423a1ca5ce","note":"Block 14","previd":"000000004aad030d7704407f400e0f4600aef2cbafdcb8a17e36158657b48879","txids":[],"type":"block"},"type":"object"}\n`
   );
 
   console.log(
@@ -396,6 +394,12 @@ socket.connect(SERVER_PORT, SERVER_HOST, async () => {
   console.log("Sending getmempool...");
 
   socket.write(`{"type":"getmempool"}`);
+
+  console.log("============ Testcase: Mempool with longer chain ============");
+
+  socket.write(
+    `{"object":{"T":"00000000abc00000000000000000000000000000000000000000000000000000","created":1672137626,"miner":"grader","nonce":"76931fac9dab2b36c248b87d6ae33f9a62d7183a5d5789e4b2d6b441fc68bc86","note":"New sixth block","previd":"000000000474866bce17e23d78a1657e8ede848af734b83454fb8bed463f18ec","txids":[],"type":"block"},"type":"object"}\n`
+  );
 });
 
 socket.on("data", (data) => {
