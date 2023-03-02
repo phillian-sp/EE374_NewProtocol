@@ -17,6 +17,7 @@ import {
   GetMempoolMessageType,
   MempoolMessageType,
   SpendingTransactionObject,
+  SpendingTransactionObject,
 } from "./message";
 import { peerManager } from "./peermanager";
 import { canonicalize } from "json-canonicalize";
@@ -272,9 +273,10 @@ export class Peer {
         type: "ihaveobject",
         objectid,
       });
+    }
 
       // update mempool if tx
-      if (SpendingTransactionObject.guard(msg.object)) {
+      if (TransactionObject.guard(msg.object)) {
         try {
           await mempoolManager.addTx(Transaction.fromNetworkObject(msg.object));
         } catch (e: any) {

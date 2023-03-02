@@ -146,6 +146,8 @@ export class Transaction {
 
     let blockCoinbase: Transaction
 
+    logger.debug(`Validating transaction ${this.txid} with ${this.inputs.length} inputs`)
+
     if (block !== undefined) {
       try {
         blockCoinbase = await block.getCoinbase()
@@ -155,26 +157,32 @@ export class Transaction {
 
     const inputValues = await Promise.all(
       this.inputs.map(async (input, i) => {
+        logger.debug(`Validating input ${i} of transaction ${this.txid}`)
+
         if (blockCoinbase !== undefined && input.outpoint.txid === blockCoinbase.txid) {
+          logger.debug(`Transaction ${this.txid} is spending coinbase transaction ${blockCoinbase.txid}`)
           throw new AnnotatedError('INVALID_TX_OUTPOINT', `Transaction ${this.txid} is spending immature coinbase`)
         }
 
         const prevOutput = await input.outpoint.resolve()
         
         if (input.sig === null) {
+          logger.debug(`No signature available for input ${i} of transaction ${this.txid}`)
           throw new AnnotatedError('INVALID_TX_SIGNATURE', `No signature available for input ${i} of transaction ${this.txid}`)
         }
         if (!await ver(input.sig, unsignedTxStr, prevOutput.pubkey)) {
+          logger.debug(`Signature validation failed for input ${i} of transaction ${this.txid}`)
           throw new AnnotatedError('INVALID_TX_SIGNATURE', `Signature validation failed for input ${i} of transaction ${this.txid}`)
         }
 
         // Ensure that a transaction does not have multiple inputs that have the same outpoint.
         for (let j = 0; j < i; j++) {
           if (this.inputs[j].outpoint.txid === input.outpoint.txid && this.inputs[j].outpoint.index === input.outpoint.index) {
+            logger.debug(`Transaction ${this.txid} has multiple inputs that spend the same outpoint.`)
             throw new AnnotatedError('INVALID_TX_OUTPOINT', `Transaction ${this.txid} has multiple inputs that spend the same outpoint.`)
           }
         }
-
+        logger.debug(`Input ${i} of transaction ${this.txid} is valid`)
         return prevOutput.value
       })
     )
