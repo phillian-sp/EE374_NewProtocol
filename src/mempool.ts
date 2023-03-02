@@ -20,14 +20,12 @@ class MempoolManager {
     } catch (e: any) {
       throw new AnnotatedError(
         "INVALID_TX_OUTPOINT",
-        `Transaction cannot be added to the mempool due to an already spent transaction input. The error was: ${e.message}`
+        `Transaction ${tx.txid} cannot be added to the mempool due to an already spent transaction input. The error was: ${e.message}`
       );
     }
   }
 
   getTxidArray() {
-    console.log("Getting mempool");
-    console.log(this.mempool);
     return this.mempool.map((tx: Transaction) => tx.txid);
   }
 
