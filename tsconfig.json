@@ -104,5 +104,5 @@
   },
   "include": [
     "src/"
-, "pset4_buggy_code/mempool.ts", "pset4_buggy_code/mempool.ts"  ]
+  ]
 }
