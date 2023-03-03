@@ -22,10 +22,10 @@ export class MiningManager {
 
     async mineBlock(block: Block) {
         let nonce = 0;
-        while (!block.hasPoW()) {
+        do {
             block.nonce = String(nonce);
             nonce++;
-        }
+        } while (!block.hasPoW());
         return block;
     }
 }
