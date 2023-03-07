@@ -129,7 +129,10 @@ export class Transaction {
   async validate(idx?: number, block?: Block) {
     logger.debug(`Validating transaction ${this.txid}`)
     const unsignedTxStr = canonicalize(this.toNetworkObject(false))
-
+    
+    if (this.inputs.length === 0 && this.outputs.length === 0) {
+      throw new AnnotatedError('INVALID_FORMAT', 'Non-coinbase transactions must have at least one input.')
+    }
     if (this.isCoinbase()) {
       if (this.outputs.length > 1) {
         throw new AnnotatedError('INVALID_FORMAT', `Invalid coinbase transaction ${this.txid}. Coinbase must have only a single output.`)

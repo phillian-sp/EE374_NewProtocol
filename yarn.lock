@@ -101,12 +101,12 @@ base64-js@^1.3.1:
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
 
-blake2@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/blake2/-/blake2-4.1.1.tgz#0c23524776ebbf76b3ffecb6fa73422a33f20526"
-  integrity sha512-HUmkY0MUDUVgejJVNrpNKAva8C4IWD/Rd862sdexoSibu86b6iu0gO0/RjovO2lM5+w6JqjIEmkuAgGhfHlnJw==
+blake2@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/blake2/-/blake2-5.0.0.tgz#6306e49d974fb051b6fb2aad669307b9838bfbaa"
+  integrity sha512-MLpq1DwBB9rC0IHuRc2gXLEAeNNTTYHEtvYCA5lK4RmoUPRmQLSLQrwgJvou62BvH9KP7whe8n+xxw45++fnYg==
   dependencies:
-    nan "^2.15.0"
+    nan "^2.17.0"
 
 buffer@^5.5.0, buffer@^5.6.0:
   version "5.7.1"
@@ -500,7 +500,7 @@ ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
-nan@^2.15.0:
+nan@^2.17.0:
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.17.0.tgz#c0150a2368a182f033e9aa5195ec76ea41a199cb"
   integrity sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==
