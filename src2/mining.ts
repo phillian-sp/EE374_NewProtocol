@@ -6,7 +6,7 @@ import { logger } from "./logger";
 import { objectManager } from "./object";
 import { peerManager } from "./peermanager";
 import { network } from "./network";
-const studentids = ["pmiao", "emily49"];
+const studentids = ["pmiao", "emily49", "aaryan04"];
 
 class Miner {
   async mine() {
