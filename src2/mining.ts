@@ -10,6 +10,7 @@ const studentids = ["pmiao", "emily49"];
 
 class Miner {
   async mine() {
+    logger.debug(`Mining now...`);
     while (true) {
       const block = this.getNewBlock();
       if (block) {

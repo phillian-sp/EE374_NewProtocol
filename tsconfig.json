@@ -33,7 +33,7 @@
         "../Website/src/server/*",
       ]
     },
-    "rootDirs": ["./src", "../Website/src"],                                   /* Allow multiple folders to be treated as one when resolving modules. */
+    "rootDirs": ["src2", "../Website/src"],                                   /* Allow multiple folders to be treated as one when resolving modules. */
     // "typeRoots": [],                                  /* Specify multiple folders that act like `./node_modules/@types`. */
     // "types": [],                                      /* Specify type package names to be included without being referenced in a source file. */
     // "allowUmdGlobalAccess": true,                     /* Allow accessing UMD globals from modules. */
@@ -103,6 +103,6 @@
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
   "include": [
-    "src/"
+    "src2"
   ]
 }
