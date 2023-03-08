@@ -3,14 +3,19 @@ const blake2 = require("blake2");
 
 const TARGET = "00000000abc00000000000000000000000000000000000000000000000000000";
 
-const { blockTemplate } = workerData;
-console.log("emilyhello");
-console.log(`block template is: ${blockTemplate}`);
+const blockTemplate = workerData;
+// console.log("emilyhello");
+// console.log("emilyhello");
+// console.log("emilyhello");
+// console.log(`block template is: ${blockTemplate}`);
 // start mining
-console.log("calling mine()");
+// console.log("calling mine()");
 mine();
 
 function change_nonce(block, nonce) {
+  if (typeof nonce == "bigint") {
+    nonce = nonce.toString(16);
+  }
   // find the nonce string in the block
   let nonce_index = block.indexOf('"nonce":');
   let nonce_start = block.indexOf('"', nonce_index + 8);
@@ -29,11 +34,12 @@ function hasPow(block) {
   hash.update(Buffer.from(block));
   const hashHex = hash.digest("hex");
   // check if the hash is less than the target
+  console.log(`Miner -- Hash is ${hashHex}`);
   return BigInt(`0x${hashHex}`) <= BigInt(`0x${TARGET}`);
 }
 
 function getRanHex(size) {
-  console.log("generating random hex...");
+  // console.log("generating random hex...");
   let result = [];
   let hexRef = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
   for (let n = 0; n < size; n++) {
@@ -43,15 +49,16 @@ function getRanHex(size) {
 }
 
 function mine() {
-  console.log("mining...");
+  // console.log("mining...");
   let nonce = getRanHex(32);
   let new_block = blockTemplate;
-  console.log("nonce is " + nonce);
+  // console.log("nonce is " + nonce);
   do {
-    console.log(`Miner -- Trying nonce of ${nonce}`);
-    let new_block = change_nonce(blockTemplate, nonce);
-    nonce++;
+    // console.log(`Miner -- Trying nonce of ${nonce}`);
+    new_block = change_nonce(new_block, nonce);
+    console.log(`Miner -- new block is ${new_block}`);
+    nonce = (nonce + 1n) % 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn;
   } while (hasPow(new_block) == false);
-  console.log(`Miner -- Found nonce of ${block.nonce}`);
-  parentPort.postMessage(block);
+  console.log(`Miner -- Found nonce of ${nonce}`);
+  parentPort.postMessage(new_block);
 }

@@ -18,9 +18,15 @@ class MemPool {
     await this.load();
     logger.debug("Mempool initialized");
     this.worker = new Worker(__dirname + "/miner/worker.js", {
-      workerData: getBlockTemplate(), //template
+      workerData: await getBlockTemplate(), //template
+      resourceLimits: {
+        maxOldGenerationSizeMb: 4096,
+        maxYoungGenerationSizeMb: 4096,
+        codeRangeSizeMb: 4096,
+      },
     });
     this.worker.on("message", async function (msg) {
+      logger.debug(`Mempool worker received message: ${msg}`);
       await objectManager.put(msg);
       network.broadcast({
         type: "ihaveobject",

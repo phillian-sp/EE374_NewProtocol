@@ -1,14 +1,33 @@
 import { Block } from "../block";
 import { mempool } from "../mempool";
 import { chainManager } from "../chain";
+import { objectManager } from "../object";
 import { logger } from "../logger";
 import { TARGET } from "../block";
 import { canonicalize } from "json-canonicalize";
+import { Transaction, Output } from "../transaction";
+import { sign, privkey, publickey } from "../crypto/signature";
+import { assert } from "console";
 
 const studentids = ["pmiao", "emily49"];
-function getNewBlock() {
+async function getNewBlock() {
   // let txids = [];
   let txids = mempool.getTxIds();
+  // add coinbase transaction
+
+  let outputs = [new Output(publickey, 50)];
+  let tx = Transaction.fromNetworkObject({
+    type: "transaction",
+    outputs: outputs,
+    height: chainManager.longestChainHeight + 1,
+    });
+  logger.info(`Miner -- Adding coinbase transaction ${tx.txid}`);
+  assert(tx.validate(), "coinbase transaction is not valid");
+  await objectManager.put(tx);
+  // push coinbase transaction to the front of the array
+  txids.unshift(tx.txid);
+  logger.info(`Miner -- txids: ${txids}`);
+
   if (chainManager.longestChainTip === null) {
     logger.info(`Miner -- No chain exists to mine on.`);
     return null;
@@ -27,8 +46,8 @@ function getNewBlock() {
   }
 }
 
-export function getBlockTemplate() {
-  const template: string = canonicalize(getNewBlock()?.toNetworkObject());
+export async function getBlockTemplate() {
+  const template: string = canonicalize((await getNewBlock())?.toNetworkObject());
   logger.debug(`Passing block template: ${template}`);
   return template;
 }

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "ts-node --require dotenv/config src/index.ts",
     "test": "ts-node --require dotenv/config src/tests.ts",
-    "both": "concurrently \"ts-node --require dotenv/config src/index.ts\" \"ts-node --require dotenv/config src/minerIndex.ts\""
+    "both": "concurrently \"ts-node --require dotenv/config src/index.ts\" \"ts-node --require dotenv/config src/minerIndex.ts\"",
+    "sign": "ts-node --require dotenv/config src/crypto/signature.ts"
   },
   "author": "Dionysis Zindros",
   "license": "MIT",
