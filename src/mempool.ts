@@ -5,14 +5,28 @@ import { AnnotatedError } from "./message";
 import { db, ObjectId, objectManager } from "./object";
 import { Transaction } from "./transaction";
 import { UTXOSet } from "./utxo";
+import { Worker, workerData } from "worker_threads";
+import { getBlockTemplate } from "./miner/mining";
+import { network } from "./network";
 
 class MemPool {
   txs: Transaction[] = [];
   state: UTXOSet | undefined;
+  worker: Worker | undefined;
 
   async init() {
     await this.load();
     logger.debug("Mempool initialized");
+    this.worker = new Worker(__dirname + "/miner/worker.js", {
+      workerData: getBlockTemplate(), //template
+    });
+    this.worker.on("message", async function (msg) {
+      await objectManager.put(msg);
+      network.broadcast({
+        type: "ihaveobject",
+        objectid: objectManager.id(msg),
+      });
+    });
   }
   getTxIds(): ObjectId[] {
     const txids = this.txs.map((tx) => tx.txid);
@@ -67,6 +81,20 @@ class MemPool {
     logger.debug(`Added transaction ${tx.txid} to mempool`);
     this.txs.push(tx);
     await this.save();
+    if (this.worker) {
+      this.worker.terminate();
+    }
+    this.worker = new Worker(__dirname + "/miner/worker.js", {
+      workerData: getBlockTemplate(), //template
+    });
+
+    this.worker.on("message", async function (msg) {
+      await objectManager.put(msg);
+      network.broadcast({
+        type: "ihaveobject",
+        objectid: objectManager.id(msg),
+      });
+    });
     return true;
   }
   async reorg(lca: Block, shortFork: Chain, longFork: Chain) {
