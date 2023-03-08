@@ -299,7 +299,7 @@ export class Peer {
     this.sendGetObject(msg.blockid);
   }
   async onMessageGetMempool(msg: GetMemPoolMessageType) {
-    const txids = [];
+    const txids: string[] = [];
 
     for (const tx of mempool.txs) {
       txids.push(tx.txid);
