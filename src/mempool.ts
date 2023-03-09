@@ -26,7 +26,14 @@ class MemPool {
       },
     });
     this.worker.on("message", async function (msg) {
-      logger.debug(`Mempool worker received message: ${msg}`);
+      // logger.debug(`Mempool worker received message: ${msg}`);
+      // if message starts with "message: " then it is a message from the worker
+      if (msg.startsWith("message: ")) {
+        logger.debug(`Mempool worker message: ${msg}`);
+        return;
+      }
+      logger.debug(`Mempool worker found block: ${msg}`);
+      
       await objectManager.put(msg);
       network.broadcast({
         type: "ihaveobject",
@@ -91,16 +98,39 @@ class MemPool {
       this.worker.terminate();
     }
     this.worker = new Worker(__dirname + "/miner/worker.js", {
-      workerData: getBlockTemplate(), //template
+      workerData: await getBlockTemplate(), //template
+      resourceLimits: {
+        maxOldGenerationSizeMb: 4096,
+        maxYoungGenerationSizeMb: 4096,
+        codeRangeSizeMb: 4096,
+      },
     });
-
     this.worker.on("message", async function (msg) {
+      // logger.debug(`Mempool worker received message: ${msg}`);
+      // if message starts with "message: " then it is a message from the worker
+      if (msg.startsWith("message: ")) {
+        logger.debug(`Mempool worker message: ${msg}`);
+        return;
+      }
+      logger.debug(`Mempool worker found block: ${msg}`);
+      
       await objectManager.put(msg);
       network.broadcast({
         type: "ihaveobject",
         objectid: objectManager.id(msg),
       });
     });
+    // this.worker = new Worker(__dirname + "/miner/worker.js", {
+    //   workerData: getBlockTemplate(), //template
+    // });
+
+    // this.worker.on("message", async function (msg) {
+    //   await objectManager.put(msg);
+    //   network.broadcast({
+    //     type: "ihaveobject",
+    //     objectid: objectManager.id(msg),
+    //   });
+    // });
     return true;
   }
   async reorg(lca: Block, shortFork: Chain, longFork: Chain) {

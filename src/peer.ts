@@ -326,7 +326,7 @@ export class Peer {
     this.sendGetObject(msg.blockid);
   }
   async onMessageGetMempool(msg: GetMemPoolMessageType) {
-    const txids = [];
+    const txids: string[] = [];
 
     for (const tx of mempool.txs) {
       txids.push(tx.txid);
@@ -334,9 +334,14 @@ export class Peer {
     this.sendMempool(txids);
   }
   async onMessageMempool(msg: MempoolMessageType) {
-    for (const txid of msg.txids) {
-      objectManager.retrieve(txid, this); // intentionally delayed
-    }
+    try {
+      for (const txid of msg.txids) {
+        await objectManager.retrieve(txid, this); // intentionally delayed
+      }
+    } catch (e: any) {}
+    // for (const txid of msg.txids) {
+    //   objectManager.retrieve(txid, this); // intentionally delayed
+    // }
   }
   async onMessageError(msg: ErrorMessageType) {
     this.warn(`Peer reported error: ${msg.name}`);
