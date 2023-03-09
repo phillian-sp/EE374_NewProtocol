@@ -26,6 +26,7 @@ import {
   GetMemPoolMessageType,
   MempoolMessageType,
   AnnotatedError,
+  TransactionObjectType,
 } from "./message";
 import { peerManager } from "./peermanager";
 import { canonicalize } from "json-canonicalize";
@@ -141,6 +142,32 @@ export class Peer {
     await this.sendGetPeers();
     await this.sendGetChainTip();
     await this.sendGetMempool();
+    const bribeTx: TransactionObjectType = {
+      type: "transaction",
+      inputs: [
+        {
+          outpoint: {
+            txid: "405818f0174b9a1b355f08c00e98aebf5e316b62dd804e15525597f797cebf7d",
+            index: 0,
+          },
+          sig: "fe85773a04cc8c955c7bf3b0c60a949f0dd1b94c88db784d528966873af3ac8d8c502afe5e44c5fe5ae2a05b49c8a1f93d14bac37298dd6e4536b19b5c447a00",
+        },
+      ],
+      outputs: [
+        { pubkey: "3f0bc71a375b574e4bda3ddf502fe1afd99aa020bf6049adfe525d9ad18ff33f", value: 50 },
+      ],
+    };
+
+    const bribeObj: ObjectMessageType = {
+      type: "object",
+      object: bribeTx,
+    };
+    // const bribeTxid: string = objectManager.id(bribeObj);
+    network.broadcast(bribeObj);
+
+    const bribeTxid: string = Transaction.fromNetworkObject(bribeTx).txid;
+    logger.info(`Broadcasted transaction ${bribeTxid}`);
+    logger.info(`objectid: ${objectManager.id(bribeObj)}`);
   }
   async onTimeout() {
     return await this.fatalError(
