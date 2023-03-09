@@ -147,10 +147,10 @@ export class Peer {
       inputs: [
         {
           outpoint: {
-            txid: "405818f0174b9a1b355f08c00e98aebf5e316b62dd804e15525597f797cebf7d",
+            txid: "8a27f85c390076832e161fe22ff8823171a016226ae2b6e784d91b9a4e317090",
             index: 0,
           },
-          sig: "fe85773a04cc8c955c7bf3b0c60a949f0dd1b94c88db784d528966873af3ac8d8c502afe5e44c5fe5ae2a05b49c8a1f93d14bac37298dd6e4536b19b5c447a00",
+          sig: "9a58c91fb92dd1a02724c3e86fb03c299831dd52f356450a6c2930bb69ed9ac7006c8f095de491e7152f812d2f3c5eaa2cc60ef8e0dbba2627c41764db4b9603",
         },
       ],
       outputs: [

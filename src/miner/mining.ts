@@ -15,7 +15,7 @@ async function getNewBlock() {
   let txids = mempool.getTxIds();
   // add coinbase transaction
 
-  let outputs = [new Output(publickey, 50)];
+  let outputs = [new Output(publickey, 50 * (10 ** 12))];
   let tx = Transaction.fromNetworkObject({
     type: "transaction",
     outputs: outputs,
@@ -39,8 +39,8 @@ async function getNewBlock() {
       "",
       TARGET,
       Math.floor(new Date().getTime() / 1000),
-      undefined,
-      undefined,
+      "Emily",
+      "Just want 50 Bu",
       studentids
     );
   }

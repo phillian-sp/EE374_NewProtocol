@@ -1,13 +1,13 @@
 const { parentPort, workerData } = require("worker_threads");
 const blake2 = require("blake2");
 
-const TARGET = "00000000abc00000000000000000000000000000000000000000000000000000";
+const TARGET = "00000abc00000000000000000000000000000000000000000000000000000000";
 
 const blockTemplate = workerData;
 parentPort.postMessage(`message: block template is: ${blockTemplate}`);
 // start mining
 parentPort.postMessage("message: calling mine()");
-mine();
+// mine();
 
 function change_nonce(block, nonce) {
   if (typeof nonce == "bigint") {
@@ -31,8 +31,11 @@ function hasPow(block) {
   hash.update(Buffer.from(block));
   const hashHex = hash.digest("hex");
   // check if the hash is less than the target
-  console.log(`Miner -- Hash is ${hashHex}`);
-  return BigInt(`0x${hashHex}`) <= BigInt(`0x${TARGET}`);
+  let result = BigInt(`0x${hashHex}`) <= BigInt(`0x${TARGET}`);
+  if (result) {
+    parentPort.postMessage(`message: Miner -- Hash is ${hashHex}`);
+  }
+  return result;
 }
 
 function getRanHex(size) {
@@ -46,10 +49,10 @@ function getRanHex(size) {
 }
 
 function mine() {
-  console.log("mining...");
+  // console.log("mining...");
   let nonce = getRanHex(32);
   let new_block = blockTemplate;
-  console.log("nonce is " + nonce);
+  // console.log("nonce is " + nonce);
   do {
     // parentPort.postMessage(`message: Miner -- Trying nonce of ${nonce}`);
     new_block = change_nonce(new_block, nonce);
