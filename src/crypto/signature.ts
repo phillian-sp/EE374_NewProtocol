@@ -43,12 +43,13 @@ export async function genKeyPair() {
 }
 
 async function main() {
-  const message = "helllooooooo"
+  const message = `{"type":"object","object":{"type":"transaction","inputs":[{"outpoint":{"txid":"405818f0174b9a1b355f08c00e98aebf5e316b62dd804e15525597f797cebf7d","index":0},"sig":null}],"outputs":[{"pubkey":"3f0bc71a375b574e4bda3ddf502fe1afd99aa020bf6049adfe525d9ad18ff33f","value":50}]}}`
   // const { pubkey, privkey } = await genKeyPair()
   // console.log(`pubkey: ${pubkey}`)
   // console.log(`privkey: ${privkey}`)
   const sig = await sign(message, privkey)
   console.log(await ver(sig, message, publickey))
+  console.log(sig)
 }
 
 main()

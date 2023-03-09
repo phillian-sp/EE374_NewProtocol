@@ -4,12 +4,9 @@ const blake2 = require("blake2");
 const TARGET = "00000000abc00000000000000000000000000000000000000000000000000000";
 
 const blockTemplate = workerData;
-// console.log("emilyhello");
-// console.log("emilyhello");
-// console.log("emilyhello");
-// console.log(`block template is: ${blockTemplate}`);
+parentPort.postMessage(`message: block template is: ${blockTemplate}`);
 // start mining
-// console.log("calling mine()");
+parentPort.postMessage("message: calling mine()");
 mine();
 
 function change_nonce(block, nonce) {
@@ -22,7 +19,7 @@ function change_nonce(block, nonce) {
   let nonce_end = block.indexOf('"', nonce_start + 1);
   // replace the nonce string with the new nonce
   let new_block =
-    block.slice(0, nonce_start + 1) + nonce + block.slice(nonce_end, blockTemplate.length);
+    block.slice(0, nonce_start + 1) + nonce + block.slice(nonce_end);
 
   // return the new block
   return new_block;
@@ -49,16 +46,21 @@ function getRanHex(size) {
 }
 
 function mine() {
-  // console.log("mining...");
+  console.log("mining...");
   let nonce = getRanHex(32);
   let new_block = blockTemplate;
-  // console.log("nonce is " + nonce);
+  console.log("nonce is " + nonce);
   do {
-    // console.log(`Miner -- Trying nonce of ${nonce}`);
+    // parentPort.postMessage(`message: Miner -- Trying nonce of ${nonce}`);
     new_block = change_nonce(new_block, nonce);
-    console.log(`Miner -- new block is ${new_block}`);
+    // after 1000 tries, print a message
+    if (nonce % 1000000n == 0n) {
+      parentPort.postMessage(`message: Miner -- Trying nonce of ${nonce.toString(16)}`);
+      parentPort.postMessage(`message: Miner -- new_block is ${new_block}!`);
+      parentPort.postMessage(`message: Miner -- block_temp is ${blockTemplate}!`);
+    }
     nonce = (nonce + 1n) % 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn;
-  } while (hasPow(new_block) == false);
-  console.log(`Miner -- Found nonce of ${nonce}`);
+  } while(hasPow(new_block) == false);
+  parentPort.postMessage(`message: Miner -- Found nonce of ${nonce}`);
   parentPort.postMessage(new_block);
 }
