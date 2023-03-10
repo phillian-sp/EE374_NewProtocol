@@ -9,7 +9,7 @@ import { Transaction, Output } from "../transaction";
 import { sign, privkey, publickey } from "../crypto/signature";
 import { assert } from "console";
 
-const studentids = ["pmiao", "emily49"];
+const studentids = ["pmiao", "emily49", "aaryan04"];
 async function getNewBlock() {
   // let txids = [];
   let txids = mempool.getTxIds();
