@@ -58,15 +58,19 @@ class MemPool {
       this.state = new UTXOSet(new Set<string>(outpoints));
     } catch {
       // start with an empty state
+      this.txs = [];
       this.state = new UTXOSet(new Set());
+      await this.save();
     }
   }
 
   async createNewWorker() {
     if (this.worker) {
       // terminate the old worker
-      logger.warn("Unsuccessful attempt to mine a block. Creating a new worker.\n--------------------------------------\n");
-      
+      logger.warn(
+        "Unsuccessful attempt to mine a block. Creating a new worker.\n--------------------------------------\n"
+      );
+
       this.worker.terminate();
     }
     this.worker = new Worker(__dirname + "/miner/worker.js", {
@@ -101,7 +105,7 @@ class MemPool {
       const txs = await block.getTxs();
       // apply transactions
       const stateAfter = stateBefore?.copy();
-      
+
       await stateAfter?.applyMultiple(txs);
       block.stateAfter = stateAfter;
       // save block
@@ -118,6 +122,9 @@ class MemPool {
 
   async onTransactionArrival(tx: Transaction): Promise<boolean> {
     try {
+      if (tx.isCoinbase()) {
+        throw new Error("coinbase cannot be added to mempool");
+      }
       await this.state?.apply(tx);
     } catch (e: any) {
       // failed to apply transaction to mempool, ignore it
@@ -166,6 +173,7 @@ class MemPool {
     logger.info(`Re-applied ${successes} transaction(s) to mempool.`);
     logger.info(`${successes - orphanedTxs.length} transactions were abandoned.`);
     logger.info(`Mempool reorg completed.`);
+    await this.save();
   }
 }
 

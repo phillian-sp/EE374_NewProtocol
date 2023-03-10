@@ -338,11 +338,17 @@ export class Peer {
     this.info(`UTXO set: ${utxoSet}`);
   }
   async onMessageMempool(msg: MempoolMessageType) {
-    try {
-      for (const txid of msg.txids) {
-        await objectManager.retrieve(txid, this); // intentionally delayed
-      }
-    } catch (e: any) {}
+    for (const txid of msg.txids) {
+      objectManager.retrieve(txid, this).catch(() => {
+        this.sendError(
+          new AnnotatedError(
+            "UNFINDABLE_OBJECT",
+            "Could not find one of the objects in the mempool"
+          )
+        );
+      });
+    }
+
     // for (const txid of msg.txids) {
     //   objectManager.retrieve(txid, this); // intentionally delayed
     // }
