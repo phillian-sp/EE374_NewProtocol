@@ -81,4 +81,4 @@ async function main() {
   console.log("txid: " + objectManager.id(bribeTx.toNetworkObject()));
 }
 
-main();
+// main();

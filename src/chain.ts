@@ -30,6 +30,7 @@ class ChainManager {
   async save() {
     await db.put('longestchain', [this.longestChainTip, this.longestChainHeight])
   }
+
   async onValidBlockArrival(block: Block) {
     if (!block.valid) {
       throw new Error(`Received onValidBlockArrival() call for invalid block ${block.blockid}`)
@@ -56,6 +57,12 @@ class ChainManager {
       this.longestChainTip = block
       await mempool.reorg(lca, shortFork, longFork)
       await this.save()
+
+      // if the worker is not running, start it
+      if (mempool.worker) {
+        mempool.worker.terminate();
+      }
+      await mempool.createNewWorker();
     }
   }
 }

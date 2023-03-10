@@ -332,6 +332,10 @@ export class Peer {
       txids.push(tx.txid);
     }
     this.sendMempool(txids);
+
+    // print utxo set
+    const utxoSet = mempool.state?.toString() ?? "null";
+    this.info(`UTXO set: ${utxoSet}`);
   }
   async onMessageMempool(msg: MempoolMessageType) {
     try {
