@@ -6,7 +6,7 @@ import { db, ObjectId, objectManager } from "./object";
 import { Transaction } from "./transaction";
 import { UTXOSet } from "./utxo";
 import { Worker, workerData } from "worker_threads";
-import { getBlockTemplate } from "./miner/mining";
+import { getBlockTemplate, current_hight } from "./miner/mining";
 import { network } from "./network";
 
 class MemPool {
@@ -87,7 +87,27 @@ class MemPool {
       logger.debug(`Mempool worker found block: ${msg}`);
 
       await objectManager.put(JSON.parse(msg));
-      await chainManager.onValidBlockArrival(await Block.fromNetworkObject(JSON.parse(msg)));
+      let block = await Block.fromNetworkObject(JSON.parse(msg));
+      block.valid = true;
+      block.height = current_hight;
+
+      // calculate state after block
+      // get parent block
+      const parentBlockString = await objectManager.get(block.previd?.toString() || "");
+      const parentBlock = await Block.fromNetworkObject(parentBlockString);
+      await parentBlock.load();
+      const stateBefore = parentBlock.stateAfter;
+      // get transactions
+      const txs = await block.getTxs();
+      // apply transactions
+      const stateAfter = stateBefore?.copy();
+      
+      await stateAfter?.applyMultiple(txs);
+      block.stateAfter = stateAfter;
+      // save block
+      block.save();
+
+      await chainManager.onValidBlockArrival(block);
       logger.debug(`the json parsed block is: ${JSON.parse(msg)}`);
       network.broadcast({
         type: "ihaveobject",
