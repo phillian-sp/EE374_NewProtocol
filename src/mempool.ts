@@ -16,6 +16,7 @@ class MemPool {
 
   async init() {
     await this.load();
+    await this.save();
     logger.debug("Mempool initialized");
     await this.createNewWorker();
   }
@@ -94,9 +95,11 @@ class MemPool {
       // calculate state after block
       // get parent block
       const parentBlockString = await objectManager.get(block.previd?.toString() || "");
+      logger.info(`parent block string: ${parentBlockString}`);
       const parentBlock = await Block.fromNetworkObject(parentBlockString);
       await parentBlock.load();
       const stateBefore = parentBlock.stateAfter;
+      logger.info(`state before: ${stateBefore?.toString()}`);
       // get transactions
       const txs = await block.getTxs();
       // apply transactions

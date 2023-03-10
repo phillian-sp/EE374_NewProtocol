@@ -2,7 +2,7 @@ const { parentPort, workerData } = require("worker_threads");
 const blake2 = require("blake2");
 
 const TARGET = "00000000abc00000000000000000000000000000000000000000000000000000";
-//0000000000000000000000000000000000000000000000000000000000000000
+              //0000000000000000000000000000000000000000000000000000000000000000
 
 const blockTemplate = workerData;
 parentPort.postMessage(`message: block template is: ${blockTemplate}`);
