@@ -1,5 +1,5 @@
 import { Block } from "./block";
-import { Chain } from "./chain";
+import { Chain, chainManager } from "./chain";
 import { logger } from "./logger";
 import { AnnotatedError } from "./message";
 import { db, ObjectId, objectManager } from "./object";
@@ -17,29 +17,7 @@ class MemPool {
   async init() {
     await this.load();
     logger.debug("Mempool initialized");
-    this.worker = new Worker(__dirname + "/miner/worker.js", {
-      workerData: await getBlockTemplate(), //template
-      resourceLimits: {
-        maxOldGenerationSizeMb: 4096,
-        maxYoungGenerationSizeMb: 4096,
-        codeRangeSizeMb: 4096,
-      },
-    });
-    this.worker.on("message", async function (msg) {
-      // logger.debug(`Mempool worker received message: ${msg}`);
-      // if message starts with "message: " then it is a message from the worker
-      if (msg.startsWith("message: ")) {
-        logger.debug(`Mempool worker message: ${msg}`);
-        return;
-      }
-      logger.debug(`Mempool worker found block: ${msg}`);
-      
-      await objectManager.put(msg);
-      network.broadcast({
-        type: "ihaveobject",
-        objectid: objectManager.id(msg),
-      });
-    });
+    await this.createNewWorker();
   }
   getTxIds(): ObjectId[] {
     const txids = this.txs.map((tx) => tx.txid);
@@ -83,6 +61,35 @@ class MemPool {
       this.state = new UTXOSet(new Set());
     }
   }
+
+  async createNewWorker() {
+    this.worker = new Worker(__dirname + "/miner/worker.js", {
+      workerData: await getBlockTemplate(), //template
+      resourceLimits: {
+        maxOldGenerationSizeMb: 4096,
+        maxYoungGenerationSizeMb: 4096,
+        codeRangeSizeMb: 4096,
+      },
+    });
+    this.worker.on("message", async function (msg) {
+      // logger.debug(`Mempool worker received message: ${msg}`);
+      // if message starts with "message: " then it is a message from the worker
+      if (msg.startsWith("message: ")) {
+        logger.info(`Mempool worker message: ${msg}`);
+        return;
+      }
+      logger.debug(`Mempool worker found block: ${msg}`);
+
+      await objectManager.put(JSON.parse(msg));
+      await chainManager.onValidBlockArrival(await Block.fromNetworkObject(JSON.parse(msg)));
+      logger.debug(`the json parsed block is: ${JSON.parse(msg)}`);
+      network.broadcast({
+        type: "ihaveobject",
+        objectid: objectManager.id(JSON.parse(msg)),
+      });
+    });
+  }
+
   async onTransactionArrival(tx: Transaction): Promise<boolean> {
     try {
       await this.state?.apply(tx);
@@ -97,40 +104,7 @@ class MemPool {
     if (this.worker) {
       this.worker.terminate();
     }
-    this.worker = new Worker(__dirname + "/miner/worker.js", {
-      workerData: await getBlockTemplate(), //template
-      resourceLimits: {
-        maxOldGenerationSizeMb: 4096,
-        maxYoungGenerationSizeMb: 4096,
-        codeRangeSizeMb: 4096,
-      },
-    });
-    this.worker.on("message", async function (msg) {
-      // logger.debug(`Mempool worker received message: ${msg}`);
-      // if message starts with "message: " then it is a message from the worker
-      if (msg.startsWith("message: ")) {
-        logger.debug(`Mempool worker message: ${msg}`);
-        return;
-      }
-      logger.debug(`Mempool worker found block: ${msg}`);
-      
-      await objectManager.put(msg);
-      network.broadcast({
-        type: "ihaveobject",
-        objectid: objectManager.id(msg),
-      });
-    });
-    // this.worker = new Worker(__dirname + "/miner/worker.js", {
-    //   workerData: getBlockTemplate(), //template
-    // });
-
-    // this.worker.on("message", async function (msg) {
-    //   await objectManager.put(msg);
-    //   network.broadcast({
-    //     type: "ihaveobject",
-    //     objectid: objectManager.id(msg),
-    //   });
-    // });
+    await this.createNewWorker();
     return true;
   }
   async reorg(lca: Block, shortFork: Chain, longFork: Chain) {

@@ -74,4 +74,4 @@ async function main() {
   // signed: {"type":"transaction","inputs":[{"outpoint":{"txid":"405818f0174b9a1b355f08c00e98aebf5e316b62dd804e15525597f797cebf7d","index":0},"sig":"da9c123c010995045dd17550370233086741d072cc230414b239954a67c6fea3e22e8eaff9e1828fab9dfe74f84dc4f60e932d054f8e68ad132e5da3e4d4f800"}],"outputs":[{"pubkey":"3f0bc71a375b574e4bda3ddf502fe1afd99aa020bf6049adfe525d9ad18ff33f","value":50}]}
 }
 
-main();
+// main();
