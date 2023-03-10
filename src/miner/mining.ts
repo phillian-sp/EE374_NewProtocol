@@ -23,7 +23,7 @@ async function getNewBlock() {
     });
   logger.info(`Miner -- Adding coinbase transaction ${tx.txid}`);
   assert(tx.validate(), "coinbase transaction is not valid");
-  await objectManager.put(tx);
+  await objectManager.put(tx.toNetworkObject());
   // push coinbase transaction to the front of the array
   txids.unshift(tx.txid);
   logger.info(`Miner -- txids: ${txids}`);
