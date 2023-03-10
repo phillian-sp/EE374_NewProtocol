@@ -8,7 +8,7 @@ const blockTemplate = workerData;
 parentPort.postMessage(`message: block template is: ${blockTemplate}`);
 // start mining
 parentPort.postMessage("message: calling mine()");
-// mine();
+mine();
 
 function hasPow(block) {
   // get the hash of the block
@@ -43,15 +43,11 @@ function mine() {
     // after 1000000 tries, print a message
     // if (nonce % 5000000n == 0n) {
     //   // parentPort.postMessage(`message: Miner -- Trying nonce of ${nonce.toString(16)}`);
-    //   parentPort.postMessage(`message: Miner -- new_block is ${new_block}!`);
+    //   // parentPort.postMessage(`message: Miner -- new_block is ${new_block}!`);
     //   // parentPort.postMessage(`message: Miner -- block_temp is ${blockTemplate}!`);
     // }
     nonce = (nonce + 1n) % 0xffffffffffffffffffffffffffffffffn;
-  } while (hasPow(new_block) == false);
-  parentPort.postMessage(
-    `message: \n--------------------\n\nMiner -- Found nonce of ${(nonce - 1n).toString(
-      16
-    )}!!!!!!\n--------------------\n\n`
-  );
+  } while(hasPow(new_block) == false);
+  parentPort.postMessage(`message: \n--------------------\n\nMiner -- Found nonce of ${(nonce - 1n).toString(16)}!!!!!!\n--------------------\n\n`);
   parentPort.postMessage(new_block);
 }
