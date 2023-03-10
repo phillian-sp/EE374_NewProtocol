@@ -57,11 +57,6 @@ class ChainManager {
       this.longestChainTip = block
       await mempool.reorg(lca, shortFork, longFork)
       await this.save()
-
-      // if the worker is not running, start it
-      if (mempool.worker) {
-        mempool.worker.terminate();
-      }
       await mempool.createNewWorker();
     }
   }

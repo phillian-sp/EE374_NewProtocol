@@ -63,6 +63,12 @@ class MemPool {
   }
 
   async createNewWorker() {
+    if (this.worker) {
+      // terminate the old worker
+      logger.warn("Unsuccessful attempt to mine a block. Creating a new worker.\n--------------------------------------\n");
+      
+      this.worker.terminate();
+    }
     this.worker = new Worker(__dirname + "/miner/worker.js", {
       workerData: await getBlockTemplate(), //template
       resourceLimits: {
@@ -101,9 +107,6 @@ class MemPool {
     logger.debug(`Added transaction ${tx.txid} to mempool`);
     this.txs.push(tx);
     await this.save();
-    if (this.worker) {
-      this.worker.terminate();
-    }
     await this.createNewWorker();
     return true;
   }
