@@ -74,6 +74,8 @@ export class Chain {
   // 2. The fork LCA..b1
   // 3. The fork LCA..b2
   static async getForks(b1: Block, b2: Block): Promise<[Block, Chain, Chain]> {
+    logger.info(`Comparing forks of blocks ${b1.blockid} and ${b2.blockid}`)
+    
     if (!b1.valid) {
       throw new Error(`Attempted to compare forks of blocks ${b1.blockid} and ${b2.blockid}, but ${b1.blockid} is invalid.`)
     }
@@ -91,6 +93,8 @@ export class Chain {
       throw new Error('Attempting to get forks between chains with no known length')
     }
     const b2Parent = await b2.loadParent()
+    logger.info(`b2Parentid: ${b2Parent?.blockid}`)
+
     if (b2Parent === null) {
       throw new Error('Attempting to get forks between chains with no shared ancestor')
     }
@@ -99,6 +103,7 @@ export class Chain {
       if (b1Parent === null) {
         throw new Error('Attempting to get forks between chains with no shared ancestor')
       }
+      logger.info(`now recursing with b1Parentid: ${b1Parent.blockid} and b2Parentid: ${b2Parent.blockid}`)
       const [lca, b1Fork, b2Fork] = await Chain.getForks(b1Parent, b2Parent)
 
       b1Fork.blocks.push(b1)
@@ -106,7 +111,7 @@ export class Chain {
 
       return [lca, b1Fork, b2Fork]
     }
-
+    
     const [lca, shortFork, longFork] = await Chain.getForks(b1, b2Parent)
     longFork.blocks.push(b2)
 

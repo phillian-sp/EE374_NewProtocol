@@ -91,7 +91,13 @@ class MemPool {
       }
       logger.debug(`Mempool worker found block: ${msg}`);
 
+      // broadcast block
       await objectManager.put(JSON.parse(msg));
+      network.broadcast({
+        type: "ihaveobject",
+        objectid: objectManager.id(JSON.parse(msg)),
+      });
+
       let block = await Block.fromNetworkObject(JSON.parse(msg));
       block.valid = true;
       block.height = current_hight;
@@ -116,10 +122,6 @@ class MemPool {
 
       await chainManager.onValidBlockArrival(block);
       logger.debug(`the json parsed block is: ${JSON.parse(msg)}`);
-      network.broadcast({
-        type: "ihaveobject",
-        objectid: objectManager.id(JSON.parse(msg)),
-      });
     });
   }
 

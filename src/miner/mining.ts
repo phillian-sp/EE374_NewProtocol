@@ -36,8 +36,12 @@ async function getNewBlock() {
     return null;
   } else {
     let previd = chainManager.longestChainTip?.blockid;
+    if (previd === null) {
+      logger.info(`Miner -- No chain exists to mine on.`);
+      throw new Error("No chain exists to mine on.");
+    }
     return new Block(
-      previd ? previd : null,
+      previd,
       txids,
       "",
       TARGET,

@@ -340,13 +340,8 @@ export class Peer {
   async onMessageMempool(msg: MempoolMessageType) {
     for (const txid of msg.txids) {
       objectManager.retrieve(txid, this).catch(() => {
-        this.sendError(
-          new AnnotatedError(
-            "UNFINDABLE_OBJECT",
-            "Could not find one of the objects in the mempool"
-          )
-        );
-      });
+        this.sendError(new AnnotatedError('UNFINDABLE_OBJECT', 'Could not find one of the objects in the mempool'))
+      })
     }
 
     // for (const txid of msg.txids) {
