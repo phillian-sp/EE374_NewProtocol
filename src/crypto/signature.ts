@@ -56,7 +56,7 @@ async function main() {
     inputs: [
       {
         outpoint: {
-          txid: "8a27f85c390076832e161fe22ff8823171a016226ae2b6e784d91b9a4e317090",
+          txid: "8aa019d2ba76dd15dd5e6eff9014cc6c1597149636f26697b2a73bf43b9903e3",
           index: 0,
         },
         sig: null,

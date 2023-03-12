@@ -10,20 +10,24 @@ import { sign, privkey, publickey } from "../crypto/signature";
 import { assert } from "console";
 
 const studentids = ["pmiao", "emily49", "aaryan04"];
-export let current_hight = -1;
+let current_height = -1;
+
+export function getCurrentHeight() {
+  return current_height;
+}
 
 async function getNewBlock() {
   // let txids = [];
   let txids = mempool.getTxIds();
   // add coinbase transaction
 
-  let outputs = [new Output(publickey, 50 * (10 ** 12))];
+  let outputs = [new Output(publickey, 50 * 10 ** 12)];
   let tx = Transaction.fromNetworkObject({
     type: "transaction",
     outputs: outputs,
     height: chainManager.longestChainHeight + 1,
-    });
-  current_hight = chainManager.longestChainHeight + 1;
+  });
+  current_height = chainManager.longestChainHeight + 1;
   logger.info(`Miner -- Adding coinbase transaction ${tx.txid}`);
   assert(tx.validate(), "coinbase transaction is not valid");
   await objectManager.put(tx.toNetworkObject());

@@ -147,14 +147,17 @@ export class Peer {
       inputs: [
         {
           outpoint: {
-            txid: "8a27f85c390076832e161fe22ff8823171a016226ae2b6e784d91b9a4e317090",
+            txid: "8aa019d2ba76dd15dd5e6eff9014cc6c1597149636f26697b2a73bf43b9903e3",
             index: 0,
           },
-          sig: "9a58c91fb92dd1a02724c3e86fb03c299831dd52f356450a6c2930bb69ed9ac7006c8f095de491e7152f812d2f3c5eaa2cc60ef8e0dbba2627c41764db4b9603",
+          sig: "823e1fc0d35fdfb7848ce8d3adc60ac43b59be7db2236efd2566b4de810aa8eff79ac963260463c20b4bb552a16bec654a092de1f6614a89805e7570865db50e",
         },
       ],
       outputs: [
-        { pubkey: "3f0bc71a375b574e4bda3ddf502fe1afd99aa020bf6049adfe525d9ad18ff33f", value: 50 },
+        {
+          pubkey: "3f0bc71a375b574e4bda3ddf502fe1afd99aa020bf6049adfe525d9ad18ff33f",
+          value: 50 * 10 ** 12,
+        },
       ],
     };
 
@@ -340,8 +343,13 @@ export class Peer {
   async onMessageMempool(msg: MempoolMessageType) {
     for (const txid of msg.txids) {
       objectManager.retrieve(txid, this).catch(() => {
-        this.sendError(new AnnotatedError('UNFINDABLE_OBJECT', 'Could not find one of the objects in the mempool'))
-      })
+        this.sendError(
+          new AnnotatedError(
+            "UNFINDABLE_OBJECT",
+            "Could not find one of the objects in the mempool"
+          )
+        );
+      });
     }
 
     // for (const txid of msg.txids) {

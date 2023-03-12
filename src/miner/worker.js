@@ -2,7 +2,8 @@ const { parentPort, workerData } = require("worker_threads");
 const blake2 = require("blake2");
 
 const TARGET = "00000000abc00000000000000000000000000000000000000000000000000000";
-              //0000000000000000000000000000000000000000000000000000000000000000
+// 0000000000000000000000000000000000000000000000000000000000000000
+// "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
 const blockTemplate = workerData;
 parentPort.postMessage(`message: block template is: ${blockTemplate}`);
@@ -47,7 +48,11 @@ function mine() {
     //   // parentPort.postMessage(`message: Miner -- block_temp is ${blockTemplate}!`);
     // }
     nonce = (nonce + 1n) % 0xffffffffffffffffffffffffffffffffn;
-  } while(hasPow(new_block) == false);
-  parentPort.postMessage(`message: \n--------------------\n\nMiner -- Found nonce of ${(nonce - 1n).toString(16)}!!!!!!\n--------------------\n\n`);
+  } while (hasPow(new_block) == false);
+  parentPort.postMessage(
+    `message: \n--------------------\n\nMiner -- Found nonce of ${(nonce - 1n).toString(
+      16
+    )}!!!!!!\n--------------------\n\n`
+  );
   parentPort.postMessage(new_block);
 }

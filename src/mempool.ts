@@ -6,7 +6,7 @@ import { db, ObjectId, objectManager } from "./object";
 import { Transaction } from "./transaction";
 import { UTXOSet } from "./utxo";
 import { Worker, workerData } from "worker_threads";
-import { getBlockTemplate, current_hight } from "./miner/mining";
+import { getBlockTemplate, getCurrentHeight } from "./miner/mining";
 import { network } from "./network";
 
 class MemPool {
@@ -100,7 +100,7 @@ class MemPool {
 
       let block = await Block.fromNetworkObject(JSON.parse(msg));
       block.valid = true;
-      block.height = current_hight;
+      block.height = getCurrentHeight();
 
       // calculate state after block
       // get parent block
