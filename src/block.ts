@@ -239,18 +239,22 @@ export class Block {
   }
   async loadParent(): Promise<Block | null> {
     let parentBlock: Block;
-
+    logger.info(`Loading parent block of ${this.blockid}: (${this.previd})`)
     if (this.previd === null) {
       return null;
     }
+
     try {
       const parentObject = await objectManager.get(this.previd);
-
+      logger.info(`Parent block of ${this.blockid} is ${JSON.stringify(parentObject)}`)
       if (!BlockObject.guard(parentObject)) {
+        logger.warn(`Parent of block ${this.blockid} is not a block`);
         return null;
       }
+      
       parentBlock = await Block.fromNetworkObject(parentObject);
     } catch (e: any) {
+      logger.warn(`Parent of block ${this.blockid} could not be loaded: ${e.message}`);
       return null;
     }
     return parentBlock;
